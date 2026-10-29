@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenSourceAi</title>
+  <meta name="claude:viewport-fit-sides" content="cover">
+  <meta name="description" content="Find the right open-source AI for your task, your computer and your license needs.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <h1>OpenSourceAi</h1>
+      <p class="tagline">Find the right open-source AI for your task, your computer and your license needs.</p>
+      <p class="counts" id="counts">Loading catalog…</p>
+      <div class="searchrow">
+        <input id="q" type="search" placeholder="Search: transcribe audio, chat in Arabic, remove background, Llama…" autocomplete="off" aria-label="Search">
+        <button id="toggleFilters" class="ghost only-mobile" aria-expanded="false" aria-controls="filters">Filters</button>
+      </div>
+      <div class="chips" id="categoryChips" role="group" aria-label="What do you want to do?"></div>
+    </div>
+  </header>
+
+  <div class="wrap layout">
+    <aside id="filters" class="filters">
+      <section>
+        <h2>License</h2>
+        <div id="licenseFilter"></div>
+      </section>
+      <section>
+        <h2>Runs on</h2>
+        <div id="hardwareFilter"></div>
+      </section>
+      <section>
+        <h2>From</h2>
+        <select id="country" aria-label="Country">
+          <option value="">Any country</option>
+        </select>
+      </section>
+      <section>
+        <h2>Source</h2>
+        <div id="sourceFilter"></div>
+      </section>
+      <button id="reset" class="ghost">Clear all filters</button>
+    </aside>
+
+    <main>
+      <div class="resultbar">
+        <span id="resultCount" aria-live="polite"></span>
+        <label>Sort
+          <select id="sort">
+            <option value="recommended">Recommended</option>
+            <option value="popular">Most popular</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </label>
+      </div>
+      <div id="results" class="grid"></div>
+      <div class="more"><button id="more" class="ghost" hidden>Show more</button></div>
+      <p id="empty" class="empty" hidden>Nothing matches. Try fewer filters or a different word.</p>
+    </main>
+  </div>
+
+  <div id="compareBar" class="comparebar" hidden>
+    <div class="wrap comparebar-inner">
+      <span id="compareList"></span>
+      <span id="compareNote" class="notice" role="status"></span>
+      <div>
+        <button id="compareClear" class="ghost">Clear</button>
+        <button id="compareOpen" class="primary">Compare</button>
+      </div>
+    </div>
+  </div>
+
+  <dialog id="compareDialog">
+    <div class="dialog-head">
+      <h2>Side-by-side</h2>
+      <button id="compareClose" class="ghost" aria-label="Close">✕</button>
+    </div>
+    <div class="table-scroll"><table id="compareTable"></table></div>
+  </dialog>
+
+  <footer class="wrap foot">
+    <p>Data from a hand-checked list plus the Hugging Face and GitHub public APIs. Only projects with a declared license are included.
+      Licenses are summarized for convenience; always read the actual license before commercial use.</p>
+    <p id="generated"></p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
