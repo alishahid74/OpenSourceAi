@@ -1,5 +1,7 @@
 # OpenSourceAi
 
+**Live site: https://alishahid74.github.io/OpenSourceAi/**
+
 A catalog of the world's open-source AI (models, tools, frameworks, datasets), built to power a
 **search & compare website** where anyone can find the right open AI for their task, hardware and license needs.
 
