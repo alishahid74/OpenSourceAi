@@ -86,3 +86,8 @@ One-time setup: in the repo, go to **Settings → Pages** and set **Source** to 
 
 A copy is also published at https://claude.ai/artifact/5CDNEjS2KPq8xiDFpAWdHp. Use the page's Share menu to choose who can open it.
 On that copy, filters aren't saved in the link.
+
+## License
+
+The code and the hand-picked list in this repo are under the [MIT License](LICENSE).
+Each project listed in the catalog has its own license, shown on its entry.
