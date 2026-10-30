@@ -93,11 +93,6 @@ To put it online, upload the `site/` folder to any static host, such as GitHub P
 - `.github/workflows/refresh.yml` re-collects the catalog every Monday, commits it if anything changed, and redeploys.
   Start it any time from the repo's **Actions** tab, under "Refresh catalog", by clicking **Run workflow**.
 
-One-time setup: in the repo, go to **Settings → Pages** and set **Source** to **GitHub Actions**.
-
-A copy is also published at https://claude.ai/artifact/5CDNEjS2KPq8xiDFpAWdHp. Use the page's Share menu to choose who can open it.
-On that copy, filters aren't saved in the link.
-
 ## License
 
 The code and the hand-picked list in this repo are under the [MIT License](LICENSE).
