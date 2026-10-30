@@ -640,7 +640,8 @@ function wire() {
 
 async function main() {
   try {
-    const res = await fetch("catalog.json");
+    // Revalidate every visit so a refreshed catalog shows up right after a deploy.
+    const res = await fetch("catalog.json", { cache: "no-cache" });
     const data = await res.json();
     items = data.items.map(prepare);
     const s = data.stats;
