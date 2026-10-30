@@ -49,7 +49,26 @@
     </aside>
 
     <main>
-      <div class="resultbar">
+      <section class="finder" aria-labelledby="finderTitle">
+        <h2 id="finderTitle">Help me choose</h2>
+        <div class="finder-q">
+          <span class="qlabel">1. What do you want to do?</span>
+          <div class="pills" id="fTask" role="group" aria-label="What do you want to do?"></div>
+        </div>
+        <div class="finder-q">
+          <span class="qlabel">2. What computer will you use?</span>
+          <div class="pills" id="fHw" role="group" aria-label="What computer will you use?"></div>
+        </div>
+        <div class="finder-q">
+          <span class="qlabel">3. Is it for a business?</span>
+          <div class="pills" id="fBiz" role="group" aria-label="Is it for a business?"></div>
+        </div>
+        <h3 class="picks-title" id="fPicksTitle">Our top picks</h3>
+        <div id="fPicks" class="grid picks"></div>
+        <button id="fAll" class="ghost">See all matches</button>
+      </section>
+
+      <div class="resultbar" id="resultsTop">
         <span id="resultCount" aria-live="polite"></span>
         <label>Sort
           <select id="sort">
@@ -82,6 +101,14 @@
       <button id="compareClose" class="ghost" aria-label="Close">✕</button>
     </div>
     <div class="table-scroll"><table id="compareTable"></table></div>
+  </dialog>
+
+  <dialog id="howtoDialog" aria-labelledby="howtoTitle">
+    <div class="dialog-head">
+      <h2 id="howtoTitle">How to use it</h2>
+      <button id="howtoClose" class="ghost" aria-label="Close">✕</button>
+    </div>
+    <div class="howto-body" id="howtoBody"></div>
   </dialog>
 
   <footer class="wrap foot">

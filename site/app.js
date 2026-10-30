@@ -119,7 +119,7 @@ function filtered() {
   return out.map((x) => x[0]);
 }
 
-function card(e) {
+function card(e, withCompare = true) {
   const lic = LICENSES[e.license_type] || LICENSES.custom;
   const hw = HARDWARE[e.hardware];
   const cat = CATEGORIES[e.category];
@@ -144,9 +144,211 @@ function card(e) {
     </div>
     <div class="card-foot">
       <span>${esc(pop)}</span>
-      <label class="cmp"><input type="checkbox" data-cmp="${e._i}" ${checked}> Compare</label>
+      <div class="card-actions">
+        <button class="howto-btn" data-howto="${e._i}">How to use</button>
+        ${withCompare ? `<label class="cmp"><input type="checkbox" data-cmp="${e._i}" ${checked}> Compare</label>` : ""}
+      </div>
     </div>
   </article>`;
+}
+
+// ---- how to use ----
+
+const PY_STEP = { t: "You need Python 3.10 or newer. In a terminal, run:" };
+
+const PIPELINE_INPUT = {
+  "text-generation": '[{"role": "user", "content": "Hello! What can you do?"}], max_new_tokens=200',
+  "image-text-to-text": '[{"role": "user", "content": [{"type": "image", "url": "photo.jpg"}, {"type": "text", "text": "What is in this picture?"}]}]',
+  "automatic-speech-recognition": '"recording.mp3"',
+  "text-to-speech": '"Hello from open-source AI"',
+  "text-to-audio": '"calm piano music"',
+  "translation": '"Good morning, how are you?"',
+  "summarization": '"Paste a long article here..."',
+  "text-classification": '"I love this product!"',
+  "token-classification": '"Ali works at the Ministry of Health in Lahore."',
+  "question-answering": 'question="Where is the Eiffel Tower?", context="The Eiffel Tower is in Paris."',
+  "zero-shot-classification": '"The match ended 2-1", candidate_labels=["sports", "politics", "tech"]',
+  "feature-extraction": '"Some text to turn into numbers"',
+  "image-classification": '"photo.jpg"',
+  "object-detection": '"photo.jpg"',
+  "image-segmentation": '"photo.jpg"',
+  "depth-estimation": '"photo.jpg"',
+  "image-to-text": '"scan.png"',
+};
+
+function hfId(e) {
+  const m = /^https:\/\/huggingface\.co\/([^/]+\/[^/]+)$/.exec(e.url);
+  return m ? m[1] : null;
+}
+
+function autoHowto(e) {
+  const id = hfId(e);
+  const task = (e.tasks || [])[0];
+  if (e.source === "github") {
+    const steps = [
+      { t: `Read the project's setup guide: ${e.url}#readme` },
+      { t: "Or download the code with Git:" },
+      { cmd: `git clone ${e.url}.git` },
+    ];
+    if (e.language) steps.push({ t: `It's written mainly in ${e.language}, so you'll need that installed.` });
+    return steps;
+  }
+  if (!id) return [{ t: `Open the project page and follow its instructions: ${e.url}` }];
+  const name = id.toLowerCase();
+  if (e.library === "gguf" || name.includes("gguf")) {
+    return [
+      { t: "Easiest: install Ollama from ollama.com/download, then run:" },
+      { cmd: `ollama run hf.co/${id}` },
+      { t: "Or with llama.cpp (winget install llama.cpp, or brew install llama.cpp):" },
+      { cmd: `llama-cli -hf ${id}` },
+    ];
+  }
+  if (e.library === "sentence-transformers") {
+    return [PY_STEP, { cmd: "pip install sentence-transformers" },
+      { code: `from sentence_transformers import SentenceTransformer\n\nmodel = SentenceTransformer("${id}")\nvecs = model.encode(["first sentence", "second sentence"])\nprint(model.similarity(vecs[0], vecs[1]))` }];
+  }
+  if (e.library === "diffusers" && task === "text-to-image") {
+    return [PY_STEP, { cmd: "pip install diffusers transformers accelerate torch" },
+      { code: `from diffusers import DiffusionPipeline\nimport torch\n\npipe = DiffusionPipeline.from_pretrained("${id}", torch_dtype=torch.float16).to("cuda")\nimage = pipe("a watercolor painting of a mountain village").images[0]\nimage.save("out.png")` },
+      { t: "Needs an NVIDIA graphics card. No coding? ComfyUI Desktop (comfy.org/download) runs most image models with clicks." }];
+  }
+  if (e.library === "mlx" && task === "text-generation") {
+    return [{ t: "For Apple Silicon Macs." }, { cmd: "pip install mlx-lm" }, { cmd: `mlx_lm.generate --model ${id} --prompt "Hello"` }];
+  }
+  if (e.library === "transformers" && task) {
+    return [PY_STEP, { cmd: "pip install transformers torch" },
+      { code: `from transformers import pipeline\n\npipe = pipeline("${task}", model="${id}")\nprint(pipe(${PIPELINE_INPUT[task] || '"your input here"'}))` },
+      { t: `More options: click "Use this model" on ${e.url}` }];
+  }
+  return [{ t: `Open the model page and click "Use this model" for ready-made code and apps: ${e.url}` }];
+}
+
+function linkify(text) {
+  return esc(text).replace(/https?:\/\/[^\s)]+[^\s).,]/g, (u) => `<a href="${u}" target="_blank" rel="noopener">${u}</a>`);
+}
+
+function codeBox(code) {
+  return `<div class="codebox"><pre><code>${esc(code)}</code></pre><button class="ghost copy" data-copy>Copy</button></div>`;
+}
+
+function openHowto(e) {
+  const steps = e.howto || autoHowto(e);
+  const lic = LICENSES[e.license_type] || LICENSES.custom;
+  const hw = HARDWARE[e.hardware];
+  const caution = {
+    "non-commercial": "This license allows personal and research use only, not business use.",
+    "restricted-open-weight": "Free to use, but the license has conditions. Read it before using this in a product.",
+    "custom": "This project uses its own license. Read it before using this in a product.",
+    "copyleft": "If you change this and share it, or run it as a service, you must share your changes under the same license.",
+  }[e.license_type];
+  $("howtoTitle").textContent = `How to use ${e.name}`;
+  $("howtoBody").innerHTML =
+    `<p class="howto-meta">${esc(lic.label)} (${esc(e.license)})${hw && hw.label !== "Not sure" ? " · " + esc(hw.label) : ""}</p>` +
+    `<ol>${steps.map((s) => `<li>${s.t ? `<p>${linkify(s.t)}</p>` : codeBox(s.cmd || s.code)}</li>`).join("")}</ol>` +
+    (caution ? `<p class="caution">${esc(caution)}</p>` : "") +
+    `<p class="howto-meta">Project page: <a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.url)}</a></p>`;
+  $("howtoDialog").showModal();
+}
+
+async function copyCode(btn) {
+  const code = btn.previousElementSibling;
+  try {
+    await navigator.clipboard.writeText(code.textContent);
+    btn.textContent = "Copied";
+  } catch {
+    const range = document.createRange();
+    range.selectNodeContents(code);
+    const sel = getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    btn.textContent = "Press Ctrl+C";
+  }
+  setTimeout(() => { btn.textContent = "Copy"; }, 1800);
+}
+
+// ---- finder ----
+
+const HW_RANK = { "cpu": 0, "n/a": 0, "laptop": 1, "gpu": 2, "datacenter": 3 };
+
+const FINDER = {
+  task: [
+    { id: "chat",       label: "Chat or write",          cats: ["llm", "app-ui", "inference"], exclude: (e) => e._cats.includes("image-gen") || (e.tasks || []).includes("image-gen") },
+    { id: "code",       label: "Help with code",         cats: ["code-llm"], extra: (e) => /coder|codestral|starcoder/i.test(e.name) || ["Aider", "OpenHands"].includes(e.name) },
+    { id: "transcribe", label: "Speech to text",         cats: ["speech-to-text"] },
+    { id: "speak",      label: "Text to speech",         cats: ["text-to-speech"] },
+    { id: "translate",  label: "Translate",              cats: ["translation"] },
+    { id: "images",     label: "Make images",            cats: ["image-gen"] },
+    { id: "video",      label: "Make video",             cats: ["video-gen"] },
+    { id: "see",        label: "Ask about photos",       cats: ["vision-language"] },
+    { id: "docs",       label: "Read scans & PDFs",      cats: ["ocr"] },
+    { id: "detect",     label: "Spot objects in photos", cats: ["vision"] },
+    { id: "music",      label: "Music & audio",          cats: ["audio-music"] },
+    { id: "search",     label: "Search my documents",    cats: ["embeddings", "agents-rag", "vector-db"] },
+  ],
+  hw: [
+    { id: 0, label: "Basic or older computer" },
+    { id: 1, label: "Modern laptop", note: "8–16 GB" },
+    { id: 2, label: "Gaming PC", note: "with graphics card" },
+    { id: 3, label: "Server or cloud" },
+  ],
+  biz: [
+    { id: "no", label: "No, personal or study" },
+    { id: "yes", label: "Yes, for business" },
+  ],
+};
+const finder = { task: "chat", hw: 1, biz: "no" };
+
+function finderMatches() {
+  const t = FINDER.task.find((x) => x.id === finder.task);
+  const out = [];
+  // Hand-picked entries come first in the list, so their copies from crawls (often under another URL) get skipped.
+  const seen = new Set(items.filter((e) => e.source === "curated").map((e) => e.name.toLowerCase()));
+  for (const e of items) {
+    if (e.source !== "curated" && seen.has(e.name.toLowerCase())) continue;
+    const rank = HW_RANK[e.hardware];
+    if (rank === undefined || rank > finder.hw) continue;
+    if (finder.biz === "yes" && (e.license_type === "non-commercial" || e.license_type === "custom")) continue;
+    // Main category only: GitHub topic tags put general libraries into many extra categories.
+    // Apps (like ComfyUI) count for the tasks they list.
+    const fits = t.cats.includes(e.category)
+      || (e.category === "app-ui" && (e.tasks || []).some((x) => t.cats.includes(x)))
+      || (t.extra && t.extra(e));
+    if (!fits || (t.exclude && t.exclude(e))) continue;
+    if (e.source !== "curated") seen.add(e.name.toLowerCase());
+    // Prefer hand-picked entries with written steps (easy ones first: no compiling), then popularity.
+    const hard = e.howto && e.howto.some((s) => /cmake|git clone|docker/.test(s.cmd || ""));
+    const score = (e.source === "curated" ? 4e12 : 0) + (e.howto ? 2e12 : 0) + (e.howto && !hard ? 1e12 : 0) + e._pop;
+    out.push([e, score]);
+  }
+  out.sort((a, b) => b[1] - a[1]);
+  return out.map((x) => x[0]);
+}
+
+function renderFinder() {
+  for (const [key, el] of [["task", "fTask"], ["hw", "fHw"], ["biz", "fBiz"]]) {
+    $(el).innerHTML = FINDER[key].map((o) =>
+      `<button class="pill" data-key="${key}" data-val="${o.id}" aria-pressed="${String(o.id === finder[key])}">${esc(o.label)}${o.note ? `<small>${esc(o.note)}</small>` : ""}</button>`
+    ).join("");
+  }
+  const list = finderMatches();
+  $("fPicks").innerHTML = list.slice(0, 3).map((e) => card(e, false)).join("") ||
+    '<p class="empty">Nothing fits that combination yet. Try a more powerful computer option.</p>';
+  $("fPicksTitle").hidden = list.length === 0;
+  $("fAll").hidden = list.length <= 3;
+  $("fAll").textContent = "See more like these";
+}
+
+function finderToFilters() {
+  const t = FINDER.task.find((x) => x.id === finder.task);
+  state.q = "";
+  state.cat = t.cats[0];
+  state.hw = new Set(Object.keys(HW_RANK).filter((k) => HW_RANK[k] <= finder.hw));
+  state.lic = finder.biz === "yes" ? new Set(["permissive", "copyleft", "restricted-open-weight"]) : new Set();
+  state.src = new Set();
+  state.country = "";
+  syncControls();
+  rerender();
+  $("resultsTop").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function render() {
@@ -311,6 +513,21 @@ function wire() {
   $("compareClose").addEventListener("click", () => $("compareDialog").close());
   $("compareDialog").addEventListener("click", (ev) => { if (ev.target === ev.currentTarget) ev.currentTarget.close(); });
   window.addEventListener("hashchange", () => { loadHash(); syncControls(); rerender(); });
+
+  document.addEventListener("click", (ev) => {
+    const how = ev.target.closest("[data-howto]");
+    if (how) { openHowto(items[+how.dataset.howto]); return; }
+    const pill = ev.target.closest(".pill");
+    if (pill) {
+      const { key, val } = pill.dataset;
+      finder[key] = key === "hw" ? +val : val;
+      renderFinder();
+    }
+  });
+  $("fAll").addEventListener("click", finderToFilters);
+  $("howtoBody").addEventListener("click", (ev) => { if (ev.target.matches("[data-copy]")) copyCode(ev.target); });
+  $("howtoClose").addEventListener("click", () => $("howtoDialog").close());
+  $("howtoDialog").addEventListener("click", (ev) => { if (ev.target === ev.currentTarget) ev.currentTarget.close(); });
 }
 
 async function main() {
@@ -326,6 +543,7 @@ async function main() {
     loadHash();
     syncControls();
     wire();
+    renderFinder();
     render();
   } catch (err) {
     $("counts").textContent = "Couldn't load the catalog. If you opened this file directly, serve the folder instead: python -m http.server -d site";

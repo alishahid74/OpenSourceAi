@@ -57,6 +57,12 @@ plus `downloads`/`likes` (Hugging Face) or `stars`/`language`/`updated` (GitHub)
 ## The website (`site/`)
 
 A static search & compare page: plain HTML, CSS and JavaScript with no build tools.
+
+- **Help me choose**: three questions (task, computer, business use) give the top 3 picks.
+- **How to use**: every entry has setup steps with copy buttons. Hand-picked entries use the `howto` steps in
+  `data/curated.json`. Each step is `{"t": text}`, `{"cmd": shell command}` or `{"code": code}`.
+  Other entries get steps generated from their type (Ollama for GGUF files, Python for Transformers models, and so on).
+
 People can search in everyday words ("transcribe audio", "remove background"), filter by task, license, hardware,
 country and source, and compare up to 4 entries side by side. Filters are saved in the URL, so a search can be shared as a link.
 
