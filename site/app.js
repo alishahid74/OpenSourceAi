@@ -624,24 +624,17 @@ function wire() {
 let stats = null;
 
 function setLang(code) {
-  LANG = LANGS[code] ? code : "en";
-  try { localStorage.setItem("opensourceai.lang", LANG); } catch { /* storage unavailable */ }
+  chooseLang(code);
   renderAll();
 }
 
-// Static text in index.html carries data-i18n (text), data-i18n-placeholder and data-i18n-aria attributes.
+// Shared text is filled in by applyI18n() in i18n.js; this adds the parts only the main page has.
 function applyStatic() {
-  document.documentElement.lang = LANG;
-  document.documentElement.dir = LANGS[LANG].dir;
-  for (const el of document.querySelectorAll("[data-i18n]")) el.textContent = t(el.dataset.i18n);
-  for (const el of document.querySelectorAll("[data-i18n-placeholder]")) el.placeholder = t(el.dataset.i18nPlaceholder);
-  for (const el of document.querySelectorAll("[data-i18n-aria]")) el.setAttribute("aria-label", t(el.dataset.i18nAria));
+  applyI18n();
   for (const o of $("pcRam").options) o.textContent = t("gb", { n: +o.value });
   for (const o of $("pcVram").options) o.textContent = o.value === "0" ? t("specs.noGpu") : t(o.value === "80" ? "specs.orMore" : "gb", { n: +o.value });
   const [before, after = ""] = t("foot.github").split("{link}");
   $("footGithub").innerHTML = `${esc(before)}<a href="https://github.com/alishahid74/OpenSourceAi" target="_blank" rel="noopener">GitHub</a>${esc(after)}`;
-  $("lang").innerHTML = Object.entries(LANGS).map(([k, l]) => `<option value="${k}" lang="${k}">${esc(l.name)}</option>`).join("");
-  $("lang").value = LANG;
 }
 
 function renderAll() {

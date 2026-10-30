@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Try AI · OpenSourceAi</title>
+  <meta name="description" content="Try open-source AI in your browser: speech to text, translation and background removal. Nothing leaves your computer.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap">
+  <link rel="stylesheet" href="style.css?v=f54205fbb1">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <div class="top-row">
+        <h1><a class="home" href="index.html" data-page="index.html">OpenSourceAi</a></h1>
+        <label class="langpick"><span class="sr-only" data-i18n="language">Language</span>
+          <select id="lang"></select>
+        </label>
+      </div>
+      <p><a href="index.html" data-page="index.html" data-i18n="try.back">← All projects</a></p>
+      <h2 class="try-title" data-i18n="try.title">Try AI right here</h2>
+      <p class="tagline" data-i18n="try.intro">These small AI models run inside your browser.</p>
+    </div>
+  </header>
+
+  <main class="wrap demos">
+    <section class="demo" aria-labelledby="sttTitle">
+      <h2 id="sttTitle" data-i18n="stt.title">Speech to text</h2>
+      <p class="demo-desc" data-i18n="stt.desc"></p>
+      <label class="demo-field"><span data-i18n="stt.lang">Spoken language</span>
+        <select id="sttLang"></select>
+      </label>
+      <div class="demo-actions">
+        <button id="sttRecord" class="primary" data-demo="stt">● Record</button>
+        <label class="ghost filebtn" data-demo-label="stt"><span data-i18n="stt.file">Choose a file</span>
+          <input id="sttFile" type="file" accept="audio/*,video/*" data-demo="stt"></label>
+        <button id="sttSampleEn" class="ghost" data-demo="stt" data-i18n="stt.sampleEn">English sample</button>
+        <button id="sttSampleFr" class="ghost" data-demo="stt" data-i18n="stt.sampleFr">French sample</button>
+      </div>
+      <audio id="sttAudio" controls hidden></audio>
+      <progress id="sttBar" max="1" hidden></progress>
+      <p id="sttStatus" class="demo-status" role="status"></p>
+      <div class="demo-out-wrap"><span class="demo-label" data-i18n="stt.out">Text</span>
+        <p id="sttOut" class="demo-out" dir="auto"></p></div>
+      <p class="demo-meta"><span class="size" data-mb="40"></span> · <span class="uses" data-name="Whisper tiny" data-license="Apache-2.0"></span>
+        · <a data-page="index.html" data-hash="#cat=speech-to-text" href="index.html#cat=speech-to-text" data-i18n="try.more">See similar projects</a></p>
+    </section>
+
+    <section class="demo" aria-labelledby="trTitle">
+      <h2 id="trTitle" data-i18n="tr.title">Translate</h2>
+      <p class="demo-desc" data-i18n="tr.desc"></p>
+      <label class="demo-field"><span data-i18n="tr.dir">Languages</span>
+        <select id="trDir"></select>
+      </label>
+      <label class="demo-field"><span data-i18n="tr.in">Text to translate</span>
+        <textarea id="trIn" rows="4" maxlength="2000" dir="auto" data-i18n-placeholder="tr.placeholder"></textarea>
+      </label>
+      <div class="demo-actions">
+        <button id="trGo" class="primary" data-demo="tr" data-i18n="tr.go">Translate</button>
+      </div>
+      <progress id="trBar" max="1" hidden></progress>
+      <p id="trStatus" class="demo-status" role="status"></p>
+      <div class="demo-out-wrap"><span class="demo-label" data-i18n="tr.out">Translation</span>
+        <p id="trOut" class="demo-out" dir="auto"></p></div>
+      <p class="demo-meta"><span class="size" data-mb="80"></span> · <span class="uses" data-name="OPUS-MT" data-license="CC-BY-4.0"></span>
+        · <a data-page="index.html" data-hash="#cat=translation" href="index.html#cat=translation" data-i18n="try.more">See similar projects</a></p>
+      <p class="demo-meta" data-i18n="tr.note"></p>
+    </section>
+
+    <section class="demo" aria-labelledby="bgTitle">
+      <h2 id="bgTitle" data-i18n="bg.title">Remove background</h2>
+      <p class="demo-desc" data-i18n="bg.desc"></p>
+      <div class="demo-actions">
+        <label class="primary filebtn" data-demo-label="bg"><span data-i18n="bg.file">Choose a photo</span>
+          <input id="bgFile" type="file" accept="image/*" data-demo="bg"></label>
+        <button id="bgSample" class="ghost" data-demo="bg" data-i18n="bg.sample">Use a sample photo</button>
+      </div>
+      <progress id="bgBar" max="1" hidden></progress>
+      <p id="bgStatus" class="demo-status" role="status"></p>
+      <div class="bg-pair" id="bgPair" hidden>
+        <figure><figcaption data-i18n="bg.before">Before</figcaption><img id="bgIn" alt=""></figure>
+        <figure><figcaption data-i18n="bg.after">After</figcaption><div id="bgOut" class="checker"></div></figure>
+      </div>
+      <div class="demo-actions"><a id="bgSave" class="ghost filebtn" download="no-background.png" hidden data-i18n="bg.save">Save picture</a></div>
+      <p class="demo-meta"><span class="size" data-mb="6"></span> · <span class="uses" data-name="MODNet" data-license="Apache-2.0"></span>
+        · <a data-page="index.html" data-hash="#cat=vision" href="index.html#cat=vision" data-i18n="try.more">See similar projects</a></p>
+    </section>
+
+    <p class="foot" data-i18n="try.small"></p>
+  </main>
+
+  <script src="i18n.js?v=d29700fe28"></script>
+  <script type="module" src="try.js?v=de1da188ed"></script>
+</body>
+</html>

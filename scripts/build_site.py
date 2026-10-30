@@ -41,13 +41,14 @@ def main():
 
 
 def stamp_assets():
-    """Point index.html at i18n.js, app.js and style.css with ?v=<hash> so browsers fetch new versions after a deploy."""
-    page = ROOT / "site" / "index.html"
-    html = page.read_text(encoding="utf-8")
-    for name in ("i18n.js", "app.js", "style.css"):
-        digest = hashlib.sha256((ROOT / "site" / name).read_bytes()).hexdigest()[:10]
-        html = re.sub(rf'"{re.escape(name)}(\?v=[0-9a-f]+)?"', f'"{name}?v={digest}"', html)
-    page.write_text(html, encoding="utf-8")
+    """Point the pages at i18n.js, app.js, try.js and style.css with ?v=<hash> so browsers fetch new versions after a deploy."""
+    for page in ("index.html", "try.html"):
+        path = ROOT / "site" / page
+        html = path.read_text(encoding="utf-8")
+        for name in ("i18n.js", "app.js", "try.js", "style.css"):
+            digest = hashlib.sha256((ROOT / "site" / name).read_bytes()).hexdigest()[:10]
+            html = re.sub(rf'"{re.escape(name)}(\?v=[0-9a-f]+)?"', f'"{name}?v={digest}"', html)
+        path.write_text(html, encoding="utf-8")
 
 
 if __name__ == "__main__":

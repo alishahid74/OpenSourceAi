@@ -68,6 +68,10 @@ A static search & compare page: plain HTML, CSS and JavaScript with no build too
   `data/curated.json`. Each step is `{"t": text}`, `{"cmd": shell command}` or `{"code": code}`.
   Other entries get steps generated from their type (Ollama for GGUF files, Python for Transformers models, and so on).
 
+- **Try AI in your browser** (`site/try.html`, `site/try.js`): three demos that run on the visitor's own computer
+  with [Transformers.js](https://github.com/huggingface/transformers.js), so nothing they record or upload leaves it.
+  Speech to text uses Whisper tiny (about 40 MB), translation uses OPUS-MT (about 80 MB per language pair, 10 languages
+  to and from English), and background removal uses MODNet (about 6 MB). The browser keeps each model after the first download.
 - **Languages**: English, Español, Français, Português, العربية, اردو, हिन्दी and 中文, chosen from the header
   (it starts in the browser's language; `?lang=ur` in the link picks one). Arabic and Urdu switch the page to right-to-left.
   The interface text lives in `site/i18n.js`; project descriptions and hand-written setup steps stay in English.
