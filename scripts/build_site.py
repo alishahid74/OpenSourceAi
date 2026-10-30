@@ -7,7 +7,9 @@ Run after scripts/collect.py, or after editing data/curated.json:
   python scripts/build_site.py
 """
 
+import hashlib
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -35,6 +37,17 @@ def main():
     out = ROOT / "site" / "catalog.json"
     out.write_text(json.dumps({"stats": catalog["stats"], "items": items}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     print(f"wrote {out} ({len(items)} items, {sum('howto' in e for e in items)} with how-to, {out.stat().st_size // 1024} KB)")
+    stamp_assets()
+
+
+def stamp_assets():
+    """Point index.html at app.js?v=<hash> and style.css?v=<hash> so browsers fetch new versions after a deploy."""
+    page = ROOT / "site" / "index.html"
+    html = page.read_text(encoding="utf-8")
+    for name in ("app.js", "style.css"):
+        digest = hashlib.sha256((ROOT / "site" / name).read_bytes()).hexdigest()[:10]
+        html = re.sub(rf'"{re.escape(name)}(\?v=[0-9a-f]+)?"', f'"{name}?v={digest}"', html)
+    page.write_text(html, encoding="utf-8")
 
 
 if __name__ == "__main__":
