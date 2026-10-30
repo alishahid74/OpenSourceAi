@@ -41,10 +41,10 @@ def main():
 
 
 def stamp_assets():
-    """Point index.html at app.js?v=<hash> and style.css?v=<hash> so browsers fetch new versions after a deploy."""
+    """Point index.html at i18n.js, app.js and style.css with ?v=<hash> so browsers fetch new versions after a deploy."""
     page = ROOT / "site" / "index.html"
     html = page.read_text(encoding="utf-8")
-    for name in ("app.js", "style.css"):
+    for name in ("i18n.js", "app.js", "style.css"):
         digest = hashlib.sha256((ROOT / "site" / name).read_bytes()).hexdigest()[:10]
         html = re.sub(rf'"{re.escape(name)}(\?v=[0-9a-f]+)?"', f'"{name}?v={digest}"', html)
     page.write_text(html, encoding="utf-8")

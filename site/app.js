@@ -1,53 +1,38 @@
 "use strict";
 
-// Friendly names for categories, plus everyday words people use to search for them.
+// Everyday English words people use to search for each category. Labels are in i18n.js ("cat.<key>").
 const CATEGORIES = {
-  "llm":            { label: "Chat & text",        words: "chat chatbot assistant write writing text llm language gpt answer reasoning" },
-  "code-llm":       { label: "Code models",        words: "code coding programming developer" },
-  "vision-language":{ label: "Chat about images",  words: "image chat describe picture photo vqa multimodal see" },
-  "vision":         { label: "Vision",             words: "detect detection segment segmentation object camera photo cutout remove background depth classify" },
-  "image-gen":      { label: "Make images",        words: "image generate generation art draw picture photo diffusion" },
-  "video-gen":      { label: "Make video",         words: "video generate generation animation movie clip" },
-  "speech-to-text": { label: "Speech to text",     words: "transcribe transcription speech voice audio subtitles dictation asr recognition" },
-  "text-to-speech": { label: "Text to speech",     words: "tts voice speak read aloud narration speech clone" },
-  "audio-music":    { label: "Music & audio",      words: "music song audio sound stems vocals" },
-  "translation":    { label: "Translation",        words: "translate translation language languages multilingual" },
-  "embeddings":     { label: "Search & embeddings",words: "search semantic embeddings similarity retrieval vector" },
-  "ocr":            { label: "Read documents (OCR)",words: "ocr scan document pdf read text extract receipt handwriting" },
-  "agents-rag":     { label: "Agents & RAG",       words: "agent agents rag automation workflow assistant documents chatbot" },
-  "inference":      { label: "Run AI locally",     words: "local offline run server serve private inference" },
-  "app-ui":         { label: "Apps & interfaces",  words: "app ui interface desktop webui gui" },
-  "vector-db":      { label: "Vector databases",   words: "vector database search store" },
-  "training":       { label: "Fine-tuning",        words: "train training finetune fine-tune lora" },
-  "framework":      { label: "Frameworks",         words: "framework library deep learning machine learning" },
-  "classic-ml-nlp": { label: "Text analysis",      words: "sentiment classify classification ner entities summarize summarization question nlp" },
-  "science":        { label: "Science",            words: "science protein biology weather climate forecast medicine" },
-  "robotics":       { label: "Robotics",           words: "robot robotics reinforcement control" },
-  "dataset":        { label: "Datasets",           words: "data dataset corpus training" },
+  "llm":             "chat chatbot assistant write writing text llm language gpt answer reasoning",
+  "code-llm":        "code coding programming developer",
+  "vision-language": "image chat describe picture photo vqa multimodal see",
+  "vision":          "detect detection segment segmentation object camera photo cutout remove background depth classify",
+  "image-gen":       "image generate generation art draw picture photo diffusion",
+  "video-gen":       "video generate generation animation movie clip",
+  "speech-to-text":  "transcribe transcription speech voice audio subtitles dictation asr recognition",
+  "text-to-speech":  "tts voice speak read aloud narration speech clone",
+  "audio-music":     "music song audio sound stems vocals",
+  "translation":     "translate translation language languages multilingual",
+  "embeddings":      "search semantic embeddings similarity retrieval vector",
+  "ocr":             "ocr scan document pdf read text extract receipt handwriting",
+  "agents-rag":      "agent agents rag automation workflow assistant documents chatbot",
+  "inference":       "local offline run server serve private inference",
+  "app-ui":          "app ui interface desktop webui gui",
+  "vector-db":       "vector database search store",
+  "training":        "train training finetune fine-tune lora",
+  "framework":       "framework library deep learning machine learning",
+  "classic-ml-nlp":  "sentiment classify classification ner entities summarize summarization question nlp",
+  "science":         "science protein biology weather climate forecast medicine",
+  "robotics":        "robot robotics reinforcement control",
+  "dataset":         "data dataset corpus training",
 };
 
-const LICENSES = {
-  "permissive":             { label: "Free for any use",       help: "MIT, Apache, BSD… including business" },
-  "copyleft":               { label: "Free, share changes",    help: "GPL, AGPL: modifications must stay open" },
-  "restricted-open-weight": { label: "Open, with conditions",  help: "Llama, Gemma, OpenRAIL: read the terms" },
-  "non-commercial":         { label: "Non-commercial only",    help: "Research and personal use" },
-  "custom":                 { label: "Other license",          help: "Check the license yourself" },
-};
+// Filter groups in display order; labels and help text are "lic.<key>", "hw.<key>", "src.<key>" in i18n.js.
+const LICENSES = ["permissive", "copyleft", "restricted-open-weight", "non-commercial", "custom"];
+const HARDWARE = ["cpu", "laptop", "gpu", "datacenter", "n/a", "unknown"];
+const SOURCES = ["curated", "huggingface", "github"];
 
-const HARDWARE = {
-  "cpu":        { label: "Any computer",     help: "Even old laptops, Raspberry Pi" },
-  "laptop":     { label: "Modern laptop",    help: "8–16 GB of memory" },
-  "gpu":        { label: "Gaming GPU",       help: "Consumer graphics card" },
-  "datacenter": { label: "Server / cloud",   help: "Multiple big GPUs" },
-  "n/a":        { label: "Software library", help: "Hardware depends on use" },
-  "unknown":    { label: "Not sure",         help: "Size not stated" },
-};
-
-const SOURCES = {
-  "curated":     { label: "Hand-picked",  help: "Checked, with descriptions" },
-  "huggingface": { label: "Hugging Face", help: "Most-downloaded models" },
-  "github":      { label: "GitHub",       help: "Most-starred projects" },
-};
+const catLabel = (c) => (CATEGORIES[c] ? t(`cat.${c}`) : c);
+const licLabel = (l) => t(`lic.${LICENSES.includes(l) ? l : "custom"}`);
 
 const PAGE = 60;
 const MAX_COMPARE = 4;
@@ -63,7 +48,7 @@ function esc(s) {
 
 function compact(n) {
   if (!n) return "";
-  return Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(n);
+  return Intl.NumberFormat(LANG, { notation: "compact", maximumFractionDigits: 1 }).format(n);
 }
 
 function popularity(e) {
@@ -78,14 +63,15 @@ function prepare(e, i) {
   e._hay = [
     e.name, e.org, e.description, e.license, e.country, e.language, e.library,
     ...(e.tasks || []),
-    ...cats.map((c) => CATEGORIES[c] ? CATEGORIES[c].label + " " + CATEGORIES[c].words : c),
+    // Category names in every language, so people can search in their own words.
+    ...cats.map((c) => CATEGORIES[c] ? Object.values(STRINGS).map((d) => d[`cat.${c}`] || "").join(" ") + " " + CATEGORIES[c] : c),
   ].join(" ").toLowerCase().replace(/[-_/]/g, " ");
   e._name = (e.name + " " + (e.org || "")).toLowerCase().replace(/[-_/]/g, " ");
   return e;
 }
 
 function tokens(q) {
-  return q.toLowerCase().replace(/[-_/]/g, " ").split(/\s+/).filter((t) => t.length > 1 || /\d/.test(t));
+  return q.toLowerCase().replace(/[-_/]/g, " ").split(/\s+/).filter((w) => w.length > 1 || /\d/.test(w) || /[^\x00-\x7f]/.test(w));
 }
 
 function filtered() {
@@ -102,9 +88,9 @@ function filtered() {
     let score = 0;
     if (toks.length) {
       let matched = 0;
-      for (const t of toks) {
-        if (e._name.includes(t)) { matched++; score += 3; }
-        else if (e._hay.includes(t)) { matched++; score += 1; }
+      for (const tok of toks) {
+        if (e._name.includes(tok)) { matched++; score += 3; }
+        else if (e._hay.includes(tok)) { matched++; score += 1; }
       }
       if (matched < Math.max(1, toks.length - 1)) continue;
       score += matched * 10;
@@ -121,14 +107,11 @@ function filtered() {
 }
 
 function card(e, withCompare = true) {
-  const lic = LICENSES[e.license_type] || LICENSES.custom;
-  const hw = HARDWARE[e.hardware];
-  const cat = CATEGORIES[e.category];
   const fit = fitFor(e);
-  const pop = e.stars ? `★ ${compact(e.stars)}` : e.downloads ? `↓ ${compact(e.downloads)}/mo` : "";
+  const pop = e.stars ? `★ ${compact(e.stars)}` : e.downloads ? `↓ ${t("card.perMonth", { n: compact(e.downloads) })}` : "";
   const desc = e.description
     ? `<p class="desc">${esc(e.description)}</p>`
-    : `<p class="desc none">${esc((e.tasks || []).slice(0, 4).join(", ") || "No description yet")}</p>`;
+    : `<p class="desc none">${esc((e.tasks || []).slice(0, 4).join(", ") || t("card.noDesc"))}</p>`;
   const checked = compare.has(e._i) ? "checked" : "";
   return `<article class="card${e.source === "curated" ? " featured" : ""}">
     <div class="card-head">
@@ -136,20 +119,20 @@ function card(e, withCompare = true) {
         <h3><a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.name)}</a></h3>
         <div class="org">${esc(e.org)}${e.country ? " · " + esc(e.country) : ""}</div>
       </div>
-      ${e.source === "curated" ? '<span class="tag pick" title="Hand-picked">Pick</span>' : ""}
+      ${e.source === "curated" ? `<span class="tag pick" title="${esc(t("card.pickTitle"))}">${esc(t("card.pick"))}</span>` : ""}
     </div>
     ${desc}
     <div class="tags">
-      <span class="tag lic-${esc(e.license_type)}" title="${esc(e.license)}">${esc(lic.label)}</span>
-      ${cat ? `<span class="tag">${esc(cat.label)}</span>` : ""}
-      ${fit ? `<span class="tag fit-${fit.level}" title="Needs ${esc(fit.size)} of memory. Your computer: ${esc(pcSummary())}">${{ good: "✓", slow: "⚠", no: "✕" }[fit.level]} ${esc(fit.text)}</span>`
-        : hw && e.hardware !== "unknown" && e.hardware !== "n/a" ? `<span class="tag">${esc(hw.label)}</span>` : ""}
+      <span class="tag lic-${esc(e.license_type)}" title="${esc(e.license)}">${esc(licLabel(e.license_type))}</span>
+      ${CATEGORIES[e.category] ? `<span class="tag">${esc(catLabel(e.category))}</span>` : ""}
+      ${fit ? `<span class="tag fit-${fit.level}" title="${esc(t("fit.title", { size: fit.size, pc: pcSummary() }))}">${{ good: "✓", slow: "⚠", no: "✕" }[fit.level]} ${esc(fit.text)}</span>`
+        : HARDWARE.includes(e.hardware) && e.hardware !== "unknown" && e.hardware !== "n/a" ? `<span class="tag">${esc(t(`hw.${e.hardware}`))}</span>` : ""}
     </div>
     <div class="card-foot">
       <span>${esc(pop)}</span>
       <div class="card-actions">
-        <button class="howto-btn" data-howto="${e._i}">How to use</button>
-        ${withCompare ? `<label class="cmp"><input type="checkbox" data-cmp="${e._i}" ${checked}> Compare</label>` : ""}
+        <button class="howto-btn" data-howto="${e._i}">${esc(t("card.howto"))}</button>
+        ${withCompare ? `<label class="cmp"><input type="checkbox" data-cmp="${e._i}" ${checked}> ${esc(t("compare.check"))}</label>` : ""}
       </div>
     </div>
   </article>`;
@@ -157,7 +140,7 @@ function card(e, withCompare = true) {
 
 // ---- how to use ----
 
-const PY_STEP = { t: "You need Python 3.10 or newer. In a terminal, run:" };
+const pyStep = () => ({ t: t("step.python") });
 
 const PIPELINE_INPUT = {
   "text-generation": '[{"role": "user", "content": "Hello! What can you do?"}], max_new_tokens=200',
@@ -189,41 +172,41 @@ function autoHowto(e) {
   const task = (e.tasks || [])[0];
   if (e.source === "github") {
     const steps = [
-      { t: `Read the project's setup guide: ${e.url}#readme` },
-      { t: "Or download the code with Git:" },
+      { t: t("step.readme", { url: `${e.url}#readme` }) },
+      { t: t("step.git") },
       { cmd: `git clone ${e.url}.git` },
     ];
-    if (e.language) steps.push({ t: `It's written mainly in ${e.language}, so you'll need that installed.` });
+    if (e.language) steps.push({ t: t("step.lang", { lang: e.language }) });
     return steps;
   }
-  if (!id) return [{ t: `Open the project page and follow its instructions: ${e.url}` }];
+  if (!id) return [{ t: t("step.openPage", { url: e.url }) }];
   const name = id.toLowerCase();
   if (e.library === "gguf" || name.includes("gguf")) {
     return [
-      { t: "Easiest: install Ollama from ollama.com/download, then run:" },
+      { t: t("step.ollama") },
       { cmd: `ollama run hf.co/${id}` },
-      { t: "Or with llama.cpp (winget install llama.cpp, or brew install llama.cpp):" },
+      { t: t("step.llamacpp") },
       { cmd: `llama-cli -hf ${id}` },
     ];
   }
   if (e.library === "sentence-transformers") {
-    return [PY_STEP, { cmd: "pip install sentence-transformers" },
+    return [pyStep(), { cmd: "pip install sentence-transformers" },
       { code: `from sentence_transformers import SentenceTransformer\n\nmodel = SentenceTransformer("${id}")\nvecs = model.encode(["first sentence", "second sentence"])\nprint(model.similarity(vecs[0], vecs[1]))` }];
   }
   if (e.library === "diffusers" && task === "text-to-image") {
-    return [PY_STEP, { cmd: "pip install diffusers transformers accelerate torch" },
+    return [pyStep(), { cmd: "pip install diffusers transformers accelerate torch" },
       { code: `from diffusers import DiffusionPipeline\nimport torch\n\npipe = DiffusionPipeline.from_pretrained("${id}", torch_dtype=torch.float16).to("cuda")\nimage = pipe("a watercolor painting of a mountain village").images[0]\nimage.save("out.png")` },
-      { t: "Needs an NVIDIA graphics card. No coding? ComfyUI Desktop (comfy.org/download) runs most image models with clicks." }];
+      { t: t("step.gpuNote") }];
   }
   if (e.library === "mlx" && task === "text-generation") {
-    return [{ t: "For Apple Silicon Macs." }, { cmd: "pip install mlx-lm" }, { cmd: `mlx_lm.generate --model ${id} --prompt "Hello"` }];
+    return [{ t: t("step.mac") }, { cmd: "pip install mlx-lm" }, { cmd: `mlx_lm.generate --model ${id} --prompt "Hello"` }];
   }
   if (e.library === "transformers" && task) {
-    return [PY_STEP, { cmd: "pip install transformers torch" },
+    return [pyStep(), { cmd: "pip install transformers torch" },
       { code: `from transformers import pipeline\n\npipe = pipeline("${task}", model="${id}")\nprint(pipe(${PIPELINE_INPUT[task] || '"your input here"'}))` },
-      { t: `More options: click "Use this model" on ${e.url}` }];
+      { t: t("step.more", { url: e.url }) }];
   }
-  return [{ t: `Open the model page and click "Use this model" for ready-made code and apps: ${e.url}` }];
+  return [{ t: t("step.hfPage", { url: e.url }) }];
 }
 
 function linkify(text) {
@@ -231,29 +214,25 @@ function linkify(text) {
 }
 
 function codeBox(code) {
-  return `<div class="codebox"><pre><code>${esc(code)}</code></pre><button class="ghost copy" data-copy>Copy</button></div>`;
+  return `<div class="codebox" dir="ltr"><pre><code>${esc(code)}</code></pre><button class="ghost copy" data-copy>${esc(t("copy"))}</button></div>`;
 }
 
 function openHowto(e) {
   const steps = e.howto || autoHowto(e);
-  const lic = LICENSES[e.license_type] || LICENSES.custom;
-  const hw = HARDWARE[e.hardware];
-  const caution = {
-    "non-commercial": "This license allows personal and research use only, not business use.",
-    "restricted-open-weight": "Free to use, but the license has conditions. Read it before using this in a product.",
-    "custom": "This project uses its own license. Read it before using this in a product.",
-    "copyleft": "If you change this and share it, or run it as a service, you must share your changes under the same license.",
-  }[e.license_type];
+  const caution = ["non-commercial", "restricted-open-weight", "custom", "copyleft"].includes(e.license_type) ? t(`caution.${e.license_type}`) : "";
   const fit = fitFor(e);
   const fitLine = fit
-    ? `<p class="howto-meta"><span class="tag fit-${fit.level}">${esc(fit.text)}</span> Needs ${esc(fit.size)} of memory${memNeed(e).quant ? " (4-bit compressed, as Ollama runs it)" : ""}. Your computer: ${esc(pcSummary())}.</p>`
+    ? `<p class="howto-meta"><span class="tag fit-${fit.level}">${esc(fit.text)}</span> ${esc(t("howto.needs", { size: fit.size, quant: memNeed(e).quant ? t("howto.quant") : "", pc: pcSummary() }))}</p>`
     : "";
-  $("howtoTitle").textContent = `How to use ${e.name}`;
+  const hwKnown = HARDWARE.includes(e.hardware) && e.hardware !== "unknown";
+  $("howtoTitle").textContent = t("howto.title", { name: e.name });
   $("howtoBody").innerHTML =
-    `<p class="howto-meta">${esc(lic.label)} (${esc(e.license)})${!fit && hw && hw.label !== "Not sure" ? " · " + esc(hw.label) : ""}</p>` + fitLine +
+    `<p class="howto-meta">${esc(licLabel(e.license_type))} (<bdi>${esc(e.license)}</bdi>)${!fit && hwKnown ? " · " + esc(t(`hw.${e.hardware}`)) : ""}</p>` + fitLine +
+    // Hand-written steps are in English; say so in other languages.
+    (e.howto && LANG !== "en" ? `<p class="howto-meta">${esc(t("howto.english"))}</p>` : "") +
     `<ol>${steps.map((s) => `<li>${s.t ? `<p>${linkify(s.t)}</p>` : codeBox(s.cmd || s.code)}</li>`).join("")}</ol>` +
     (caution ? `<p class="caution">${esc(caution)}</p>` : "") +
-    `<p class="howto-meta">Project page: <a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.url)}</a></p>`;
+    `<p class="howto-meta">${esc(t("howto.page"))} <a href="${esc(e.url)}" target="_blank" rel="noopener" dir="ltr">${esc(e.url)}</a></p>`;
   $("howtoDialog").showModal();
 }
 
@@ -261,16 +240,16 @@ async function copyCode(btn) {
   const code = btn.previousElementSibling;
   try {
     await navigator.clipboard.writeText(code.textContent);
-    btn.textContent = "Copied";
+    btn.textContent = t("copied");
   } catch {
     const range = document.createRange();
     range.selectNodeContents(code);
     const sel = getSelection();
     sel.removeAllRanges();
     sel.addRange(range);
-    btn.textContent = "Press Ctrl+C";
+    btn.textContent = t("pressCopy");
   }
-  setTimeout(() => { btn.textContent = "Copy"; }, 1800);
+  setTimeout(() => { btn.textContent = t("copy"); }, 1800);
 }
 
 // ---- finder ----
@@ -279,29 +258,29 @@ const HW_RANK = { "cpu": 0, "n/a": 0, "laptop": 1, "gpu": 2, "datacenter": 3 };
 
 const FINDER = {
   task: [
-    { id: "chat",       label: "Chat or write",          cats: ["llm", "app-ui", "inference"], exclude: (e) => e._cats.includes("image-gen") || (e.tasks || []).includes("image-gen") },
-    { id: "code",       label: "Help with code",         cats: ["code-llm"], extra: (e) => /coder|codestral|starcoder/i.test(e.name) || ["Aider", "OpenHands"].includes(e.name) },
-    { id: "transcribe", label: "Speech to text",         cats: ["speech-to-text"] },
-    { id: "speak",      label: "Text to speech",         cats: ["text-to-speech"] },
-    { id: "translate",  label: "Translate",              cats: ["translation"] },
-    { id: "images",     label: "Make images",            cats: ["image-gen"] },
-    { id: "video",      label: "Make video",             cats: ["video-gen"] },
-    { id: "see",        label: "Ask about photos",       cats: ["vision-language"] },
-    { id: "docs",       label: "Read scans & PDFs",      cats: ["ocr"] },
-    { id: "detect",     label: "Spot objects in photos", cats: ["vision"] },
-    { id: "music",      label: "Music & audio",          cats: ["audio-music"] },
-    { id: "search",     label: "Search my documents",    cats: ["embeddings", "agents-rag", "vector-db"] },
+    { id: "chat",       cats: ["llm", "app-ui", "inference"], exclude: (e) => e._cats.includes("image-gen") || (e.tasks || []).includes("image-gen") },
+    { id: "code",       cats: ["code-llm"], extra: (e) => /coder|codestral|starcoder/i.test(e.name) || ["Aider", "OpenHands"].includes(e.name) },
+    { id: "transcribe", cats: ["speech-to-text"] },
+    { id: "speak",      cats: ["text-to-speech"] },
+    { id: "translate",  cats: ["translation"] },
+    { id: "images",     cats: ["image-gen"] },
+    { id: "video",      cats: ["video-gen"] },
+    { id: "see",        cats: ["vision-language"] },
+    { id: "docs",       cats: ["ocr"] },
+    { id: "detect",     cats: ["vision"] },
+    { id: "music",      cats: ["audio-music"] },
+    { id: "search",     cats: ["embeddings", "agents-rag", "vector-db"] },
   ],
-  // Each answer is a typical machine; "Set my exact computer" overrides it.
+  // Labels are "task.<id>", "hwq.<id>" and "biz.<id>" in i18n.js. Each computer answer is a typical machine; "Set my exact computer" overrides it.
   hw: [
-    { id: 0, label: "Basic or older computer", ram: 8, vram: 0 },
-    { id: 1, label: "Modern laptop", note: "8–16 GB", ram: 16, vram: 0 },
-    { id: 2, label: "Gaming PC", note: "with graphics card", ram: 32, vram: 12 },
-    { id: 3, label: "Server or cloud", ram: 256, vram: 80 },
+    { id: 0, ram: 8, vram: 0 },
+    { id: 1, note: true, ram: 16, vram: 0 },
+    { id: 2, note: true, ram: 32, vram: 12 },
+    { id: 3, ram: 256, vram: 80 },
   ],
   biz: [
-    { id: "no", label: "No, personal or study" },
-    { id: "yes", label: "Yes, for business" },
+    { id: "no" },
+    { id: "yes" },
   ],
 };
 const finder = { task: "chat", hw: 1, biz: "no" };
@@ -351,21 +330,19 @@ function fitFor(e) {
   const need = memNeed(e);
   if (!need) return null;
   const gpu = pc.mac ? pc.ram * 0.7 : pc.vram;
-  const size = need.gb < 1 ? "under 1 GB" : `~${need.gb < 10 ? need.gb.toFixed(1) : Math.round(need.gb)} GB`;
-  if (gpu && need.gb <= gpu * 0.9) return { level: "good", text: "Runs well", size };
-  if (need.gpuOnly) {
-    return need.gb <= pc.ram * 0.75
-      ? { level: "slow", text: "Very slow without a GPU", size }
-      : { level: "no", text: "Too big", size };
-  }
-  if (need.gb <= Math.min(4, pc.ram * 0.5)) return { level: "good", text: "Runs well", size };
-  if (need.gb <= pc.ram * 0.75) return { level: "slow", text: "Runs slowly", size };
-  return { level: "no", text: "Too big", size };
+  const size = need.gb < 1 ? t("size.under1")
+    : t("size.about", { n: need.gb.toLocaleString(LANG, { maximumFractionDigits: need.gb < 10 ? 1 : 0 }) });
+  const fit = (level, key) => ({ level, text: t(`fit.${key}`), size });
+  if (gpu && need.gb <= gpu * 0.9) return fit("good", "good");
+  if (need.gpuOnly) return need.gb <= pc.ram * 0.75 ? fit("slow", "slowGpu") : fit("no", "no");
+  if (need.gb <= Math.min(4, pc.ram * 0.5)) return fit("good", "good");
+  if (need.gb <= pc.ram * 0.75) return fit("slow", "slow");
+  return fit("no", "no");
 }
 
 function pcSummary() {
-  const gpu = pc.mac ? "Apple chip" : pc.vram ? `${pc.vram} GB graphics card` : "no graphics card";
-  return `${pc.ram} GB RAM, ${gpu}`;
+  const gpu = pc.mac ? t("pc.apple") : pc.vram ? t("pc.gpu", { n: pc.vram }) : t("pc.noGpu");
+  return t("pc.summary", { ram: pc.ram, gpu });
 }
 
 function syncPCControls() {
@@ -384,7 +361,7 @@ function pcChanged() {
 }
 
 function finderMatches() {
-  const t = FINDER.task.find((x) => x.id === finder.task);
+  const task = FINDER.task.find((x) => x.id === finder.task);
   const out = [];
   // Hand-picked entries come first in the list, so their copies from crawls (often under another URL) get skipped.
   const seen = new Set(items.filter((e) => e.source === "curated").map((e) => e.name.toLowerCase()));
@@ -396,10 +373,10 @@ function finderMatches() {
     if (finder.biz === "yes" && (e.license_type === "non-commercial" || e.license_type === "custom")) continue;
     // Main category only: GitHub topic tags put general libraries into many extra categories.
     // Apps (like ComfyUI) count for the tasks they list.
-    const fits = t.cats.includes(e.category)
-      || (e.category === "app-ui" && (e.tasks || []).some((x) => t.cats.includes(x)))
-      || (t.extra && t.extra(e));
-    if (!fits || (t.exclude && t.exclude(e))) continue;
+    const fits = task.cats.includes(e.category)
+      || (e.category === "app-ui" && (e.tasks || []).some((x) => task.cats.includes(x)))
+      || (task.extra && task.extra(e));
+    if (!fits || (task.exclude && task.exclude(e))) continue;
     if (e.source !== "curated") seen.add(e.name.toLowerCase());
     // Prefer hand-picked entries with written steps (easy ones first: no compiling), then popularity.
     const hard = e.howto && e.howto.some((s) => /cmake|git clone|docker/.test(s.cmd || ""));
@@ -413,27 +390,26 @@ function finderMatches() {
 
 function renderFinder() {
   const preset = presetFor(pc);
-  for (const [key, el] of [["task", "fTask"], ["hw", "fHw"], ["biz", "fBiz"]]) {
+  for (const [key, el, prefix] of [["task", "fTask", "task"], ["hw", "fHw", "hwq"], ["biz", "fBiz", "biz"]]) {
     const current = key === "hw" ? preset : finder[key];
     $(el).innerHTML = FINDER[key].map((o) =>
-      `<button class="pill" data-key="${key}" data-val="${o.id}" aria-pressed="${String(o.id === current)}">${esc(o.label)}${o.note ? `<small>${esc(o.note)}</small>` : ""}</button>`
+      `<button class="pill" data-key="${key}" data-val="${o.id}" aria-pressed="${String(o.id === current)}">${esc(t(`${prefix}.${o.id}`))}${o.note ? `<small>${esc(t(`${prefix}.${o.id}.note`))}</small>` : ""}</button>`
     ).join("");
   }
   if (preset === null) {
-    $("fHw").insertAdjacentHTML("beforeend", `<button class="pill" aria-pressed="true" disabled>My computer<small>${esc(pcSummary())}</small></button>`);
+    $("fHw").insertAdjacentHTML("beforeend", `<button class="pill" aria-pressed="true" disabled>${esc(t("finder.myComputer"))}<small>${esc(pcSummary())}</small></button>`);
   }
   const list = finderMatches();
   $("fPicks").innerHTML = list.slice(0, 3).map((e) => card(e, false)).join("") ||
-    '<p class="empty">Nothing fits that combination yet. Try a more powerful computer option.</p>';
+    `<p class="empty">${esc(t("finder.none"))}</p>`;
   $("fPicksTitle").hidden = list.length === 0;
   $("fAll").hidden = list.length <= 3;
-  $("fAll").textContent = "See more like these";
 }
 
 function finderToFilters() {
-  const t = FINDER.task.find((x) => x.id === finder.task);
+  const task = FINDER.task.find((x) => x.id === finder.task);
   state.q = "";
-  state.cat = t.cats[0];
+  state.cat = task.cats[0];
   state.hw = new Set(Object.keys(HW_RANK).filter((k) => HW_RANK[k] <= finder.hw));
   state.lic = finder.biz === "yes" ? new Set(["permissive", "copyleft", "restricted-open-weight"]) : new Set();
   state.src = new Set();
@@ -446,10 +422,10 @@ function finderToFilters() {
 
 function render() {
   const list = filtered();
-  $("resultCount").textContent = `${list.length.toLocaleString()} result${list.length === 1 ? "" : "s"}`;
+  $("resultCount").textContent = t("results", { n: list.length });
   $("results").innerHTML = list.slice(0, state.shown).map(card).join("");
   $("more").hidden = list.length <= state.shown;
-  $("more").textContent = `Show more (${(list.length - state.shown).toLocaleString()} left)`;
+  $("more").textContent = t("more", { n: list.length - state.shown });
   $("empty").hidden = list.length > 0;
   for (const btn of $("categoryChips").children) btn.setAttribute("aria-pressed", String(btn.dataset.cat === state.cat));
   saveHash();
@@ -460,17 +436,12 @@ function rerender() {
   render();
 }
 
-function optionList(container, defs, set, counts) {
-  container.innerHTML = Object.entries(defs)
-    .filter(([k]) => counts[k])
-    .map(([k, d]) => `<label class="opt"><input type="checkbox" value="${esc(k)}">
-      <span>${esc(d.label)}<small>${esc(d.help)}</small></span><span class="n">${compact(counts[k])}</span></label>`)
+function optionList(container, keys, prefix, set, counts) {
+  container.innerHTML = keys
+    .filter((k) => counts[k])
+    .map((k) => `<label class="opt"><input type="checkbox" value="${esc(k)}" ${set.has(k) ? "checked" : ""}>
+      <span>${esc(t(`${prefix}.${k}`))}<small>${esc(t(`${prefix}.${k}.help`))}</small></span><span class="n">${compact(counts[k])}</span></label>`)
     .join("");
-  container.addEventListener("change", (ev) => {
-    const v = ev.target.value;
-    ev.target.checked ? set.add(v) : set.delete(v);
-    rerender();
-  });
 }
 
 function countBy(fn) {
@@ -479,29 +450,24 @@ function countBy(fn) {
   return c;
 }
 
+// Draws the category chips and sidebar options; runs again when the language changes.
 function buildFilters() {
   const catCounts = countBy((e) => e._cats);
-  const chips = [`<button class="chip" data-cat="">All<span class="n">${compact(items.length)}</span></button>`];
-  for (const [k, d] of Object.entries(CATEGORIES)) {
-    if (catCounts[k]) chips.push(`<button class="chip" data-cat="${k}">${esc(d.label)}<span class="n">${compact(catCounts[k])}</span></button>`);
+  const chips = [`<button class="chip" data-cat="">${esc(t("all"))}<span class="n">${compact(items.length)}</span></button>`];
+  for (const k of Object.keys(CATEGORIES)) {
+    if (catCounts[k]) chips.push(`<button class="chip" data-cat="${k}">${esc(catLabel(k))}<span class="n">${compact(catCounts[k])}</span></button>`);
   }
   $("categoryChips").innerHTML = chips.join("");
-  $("categoryChips").addEventListener("click", (ev) => {
-    const b = ev.target.closest(".chip");
-    if (!b) return;
-    state.cat = b.dataset.cat === state.cat ? "" : b.dataset.cat;
-    rerender();
-  });
 
-  optionList($("licenseFilter"), LICENSES, state.lic, countBy((e) => e.license_type));
-  optionList($("hardwareFilter"), HARDWARE, state.hw, countBy((e) => e.hardware));
-  optionList($("sourceFilter"), SOURCES, state.src, countBy((e) => e.source));
+  optionList($("licenseFilter"), LICENSES, "lic", state.lic, countBy((e) => e.license_type));
+  optionList($("hardwareFilter"), HARDWARE, "hw", state.hw, countBy((e) => e.hardware));
+  optionList($("sourceFilter"), SOURCES, "src", state.src, countBy((e) => e.source));
 
   // Curated entries may say "USA/France"; split so each country is selectable.
   const countries = new Set();
   for (const e of items) for (const c of (e.country || "").split("/")) if (c.trim()) countries.add(c.trim());
-  $("country").insertAdjacentHTML("beforeend",
-    [...countries].sort().map((c) => `<option value="${esc(c)}">${esc(c)}</option>`).join(""));
+  $("country").innerHTML = `<option value="">${esc(t("side.anyCountry"))}</option>` +
+    [...countries].sort().map((c) => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
 }
 
 function syncControls() {
@@ -551,19 +517,19 @@ function renderCompareBar() {
 function openCompare() {
   const list = [...compare.values()];
   const rows = [
-    ["Made by", (e) => esc(e.org) || "—"],
-    ["Country", (e) => esc(e.country) || "—"],
-    ["What it does", (e) => esc(e.description) || esc((e.tasks || []).join(", ")) || "—"],
-    ["Category", (e) => esc(e._cats.map((c) => CATEGORIES[c]?.label || c).join(", "))],
-    ["License", (e) => `<span class="tag lic-${esc(e.license_type)}">${esc((LICENSES[e.license_type] || LICENSES.custom).label)}</span><br><small>${esc(e.license)}</small>`],
-    ["On your computer", (e) => { const f = fitFor(e); return f ? `<span class="tag fit-${f.level}">${esc(f.text)}</span><br><small>Needs ${esc(f.size)}</small>` : esc(HARDWARE[e.hardware]?.label || e.hardware); }],
-    ["Popularity", (e) => [e.stars && `★ ${compact(e.stars)} stars`, e.downloads && `↓ ${compact(e.downloads)} downloads/mo`, e.likes && `♥ ${compact(e.likes)} likes`].filter(Boolean).join("<br>") || "—"],
-    ["Language", (e) => esc(e.language || e.library) || "—"],
-    ["Link", (e) => `<a href="${esc(e.url)}" target="_blank" rel="noopener">Open ↗</a>`],
+    ["cmp.madeBy", (e) => esc(e.org) || "—"],
+    ["cmp.country", (e) => esc(e.country) || "—"],
+    ["cmp.what", (e) => esc(e.description) || esc((e.tasks || []).join(", ")) || "—"],
+    ["cmp.category", (e) => esc(e._cats.map(catLabel).join(", "))],
+    ["cmp.license", (e) => `<span class="tag lic-${esc(e.license_type)}">${esc(licLabel(e.license_type))}</span><br><small>${esc(e.license)}</small>`],
+    ["cmp.yourPc", (e) => { const f = fitFor(e); return f ? `<span class="tag fit-${f.level}">${esc(f.text)}</span><br><small>${esc(t("cmp.needs", { size: f.size }))}</small>` : esc(HARDWARE.includes(e.hardware) ? t(`hw.${e.hardware}`) : e.hardware); }],
+    ["cmp.popularity", (e) => [e.stars && t("cmp.stars", { n: compact(e.stars) }), e.downloads && t("cmp.downloads", { n: compact(e.downloads) }), e.likes && t("cmp.likes", { n: compact(e.likes) })].filter(Boolean).map(esc).join("<br>") || "—"],
+    ["cmp.language", (e) => esc(e.language || e.library) || "—"],
+    ["cmp.link", (e) => `<a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(t("cmp.open"))}</a>`],
   ];
   $("compareTable").innerHTML =
     `<thead><tr><th></th>${list.map((e) => `<th scope="col">${esc(e.name)}</th>`).join("")}</tr></thead><tbody>` +
-    rows.map(([label, fn]) => `<tr><th scope="row">${label}</th>${list.map((e) => `<td>${fn(e)}</td>`).join("")}</tr>`).join("") +
+    rows.map(([label, fn]) => `<tr><th scope="row">${esc(t(label))}</th>${list.map((e) => `<td>${fn(e)}</td>`).join("")}</tr>`).join("") +
     "</tbody>";
   $("compareDialog").showModal();
 }
@@ -571,10 +537,10 @@ function openCompare() {
 // ---- wiring ----
 
 function wire() {
-  let t;
+  let timer;
   $("q").addEventListener("input", (ev) => {
-    clearTimeout(t);
-    t = setTimeout(() => { state.q = ev.target.value.trim(); rerender(); }, 120);
+    clearTimeout(timer);
+    timer = setTimeout(() => { state.q = ev.target.value.trim(); rerender(); }, 120);
   });
   $("sort").addEventListener("change", (ev) => { state.sort = ev.target.value; rerender(); });
   $("country").addEventListener("change", (ev) => { state.country = ev.target.value; rerender(); });
@@ -595,7 +561,7 @@ function wire() {
     if (ev.target.checked) {
       if (compare.size >= MAX_COMPARE) {
         ev.target.checked = false;
-        $("compareNote").textContent = `You can compare up to ${MAX_COMPARE} at a time. Untick one first.`;
+        $("compareNote").textContent = t("compare.limit", { n: MAX_COMPARE });
         return;
       }
       compare.set(e._i, e);
@@ -606,6 +572,21 @@ function wire() {
   $("compareOpen").addEventListener("click", openCompare);
   $("compareClose").addEventListener("click", () => $("compareDialog").close());
   $("compareDialog").addEventListener("click", (ev) => { if (ev.target === ev.currentTarget) ev.currentTarget.close(); });
+  $("categoryChips").addEventListener("click", (ev) => {
+    const b = ev.target.closest(".chip");
+    if (!b) return;
+    state.cat = b.dataset.cat === state.cat ? "" : b.dataset.cat;
+    rerender();
+  });
+  // Look the set up on each change: reset and loadHash replace state.lic/hw/src with new sets.
+  for (const [id, key] of [["licenseFilter", "lic"], ["hardwareFilter", "hw"], ["sourceFilter", "src"]]) {
+    $(id).addEventListener("change", (ev) => {
+      const v = ev.target.value;
+      ev.target.checked ? state[key].add(v) : state[key].delete(v);
+      rerender();
+    });
+  }
+  $("lang").addEventListener("change", (ev) => setLang(ev.target.value));
   window.addEventListener("hashchange", () => { loadHash(); syncControls(); rerender(); });
 
   document.addEventListener("click", (ev) => {
@@ -638,26 +619,60 @@ function wire() {
   $("howtoDialog").addEventListener("click", (ev) => { if (ev.target === ev.currentTarget) ev.currentTarget.close(); });
 }
 
+// ---- language ----
+
+let stats = null;
+
+function setLang(code) {
+  LANG = LANGS[code] ? code : "en";
+  try { localStorage.setItem("opensourceai.lang", LANG); } catch { /* storage unavailable */ }
+  renderAll();
+}
+
+// Static text in index.html carries data-i18n (text), data-i18n-placeholder and data-i18n-aria attributes.
+function applyStatic() {
+  document.documentElement.lang = LANG;
+  document.documentElement.dir = LANGS[LANG].dir;
+  for (const el of document.querySelectorAll("[data-i18n]")) el.textContent = t(el.dataset.i18n);
+  for (const el of document.querySelectorAll("[data-i18n-placeholder]")) el.placeholder = t(el.dataset.i18nPlaceholder);
+  for (const el of document.querySelectorAll("[data-i18n-aria]")) el.setAttribute("aria-label", t(el.dataset.i18nAria));
+  for (const o of $("pcRam").options) o.textContent = t("gb", { n: +o.value });
+  for (const o of $("pcVram").options) o.textContent = o.value === "0" ? t("specs.noGpu") : t(o.value === "80" ? "specs.orMore" : "gb", { n: +o.value });
+  const [before, after = ""] = t("foot.github").split("{link}");
+  $("footGithub").innerHTML = `${esc(before)}<a href="https://github.com/alishahid74/OpenSourceAi" target="_blank" rel="noopener">GitHub</a>${esc(after)}`;
+  $("lang").innerHTML = Object.entries(LANGS).map(([k, l]) => `<option value="${k}" lang="${k}">${esc(l.name)}</option>`).join("");
+  $("lang").value = LANG;
+}
+
+function renderAll() {
+  applyStatic();
+  if (!stats) return;
+  const countries = new Set(items.flatMap((e) => (e.country || "").split("/").map((c) => c.trim()).filter(Boolean)));
+  $("counts").textContent = t("counts", { n: items.length, k: Object.keys(stats.by_category).length, c: countries.size });
+  $("generated").textContent = t("updated", { date: new Date(stats.generated).toLocaleDateString(LANG, { year: "numeric", month: "long", day: "numeric" }) });
+  buildFilters();
+  syncControls();
+  syncPCControls();
+  renderFinder();
+  render();
+  renderCompareBar();
+}
+
 async function main() {
+  LANG = detectLang();
+  applyStatic();
   try {
     // Revalidate every visit so a refreshed catalog shows up right after a deploy.
     const res = await fetch("catalog.json", { cache: "no-cache" });
     const data = await res.json();
     items = data.items.map(prepare);
-    const s = data.stats;
-    const countries = new Set(items.flatMap((e) => (e.country || "").split("/").map((c) => c.trim()).filter(Boolean)));
-    $("counts").textContent = `${items.length.toLocaleString()} open-source AI projects · ${Object.keys(s.by_category).length} kinds of task · hand-picked entries from ${countries.size} countries`;
-    $("generated").textContent = `Catalog updated ${new Date(s.generated).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}.`;
-    buildFilters();
+    stats = data.stats;
     loadHash();
-    syncControls();
     loadPC();
-    syncPCControls();
     wire();
-    renderFinder();
-    render();
+    renderAll();
   } catch (err) {
-    $("counts").textContent = "Couldn't load the catalog. If you opened this file directly, serve the folder instead: python -m http.server -d site";
+    $("counts").textContent = t("loadError");
     console.error(err);
   }
 }

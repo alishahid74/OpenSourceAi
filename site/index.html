@@ -9,103 +9,106 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap">
-  <link rel="stylesheet" href="style.css?v=fd90a075da">
+  <link rel="stylesheet" href="style.css?v=d4f261ef31">
 </head>
 <body>
   <header class="top">
     <div class="wrap">
-      <h1>OpenSourceAi</h1>
-      <p class="tagline">Find the right open-source AI for your task, your computer and your license needs.</p>
-      <p class="counts" id="counts">Loading catalog…</p>
-      <div class="searchrow">
-        <input id="q" type="search" placeholder="Search: transcribe audio, chat in Arabic, remove background, Llama…" autocomplete="off" aria-label="Search">
-        <button id="toggleFilters" class="ghost only-mobile" aria-expanded="false" aria-controls="filters">Filters</button>
+      <div class="top-row">
+        <h1>OpenSourceAi</h1>
+        <label class="langpick"><span class="sr-only" data-i18n="language">Language</span>
+          <select id="lang"></select>
+        </label>
       </div>
-      <div class="chips" id="categoryChips" role="group" aria-label="What do you want to do?"></div>
+      <p class="tagline" data-i18n="tagline">Find the right open-source AI for your task, your computer and your license needs.</p>
+      <p class="counts" id="counts" data-i18n="loading">Loading catalog…</p>
+      <div class="searchrow">
+        <input id="q" type="search" data-i18n-placeholder="searchPlaceholder" data-i18n-aria="search" placeholder="Search: transcribe audio, chat in Arabic, remove background, Llama…" autocomplete="off" aria-label="Search">
+        <button id="toggleFilters" class="ghost only-mobile" aria-expanded="false" aria-controls="filters" data-i18n="filters">Filters</button>
+      </div>
+      <div class="chips" id="categoryChips" role="group" data-i18n-aria="finder.q1" aria-label="What do you want to do?"></div>
     </div>
   </header>
 
   <div class="wrap layout">
     <aside id="filters" class="filters">
       <section>
-        <h2>Your computer</h2>
+        <h2 data-i18n="side.computer">Your computer</h2>
         <label class="opt"><input type="checkbox" id="fitsOnly">
-          <span>Hide what's too big<small id="pcSummary">Set in "Help me choose"</small></span></label>
+          <span><span data-i18n="side.hideTooBig">Hide what's too big</span><small id="pcSummary"></small></span></label>
       </section>
       <section>
-        <h2>License</h2>
+        <h2 data-i18n="side.license">License</h2>
         <div id="licenseFilter"></div>
       </section>
       <section>
-        <h2>Runs on</h2>
+        <h2 data-i18n="side.runsOn">Runs on</h2>
         <div id="hardwareFilter"></div>
       </section>
       <section>
-        <h2>From</h2>
-        <select id="country" aria-label="Country">
-          <option value="">Any country</option>
-        </select>
+        <h2 data-i18n="side.from">From</h2>
+        <select id="country" data-i18n-aria="cmp.country" aria-label="Country"></select>
       </section>
       <section>
-        <h2>Source</h2>
+        <h2 data-i18n="side.source">Source</h2>
         <div id="sourceFilter"></div>
       </section>
-      <button id="reset" class="ghost">Clear all filters</button>
+      <button id="reset" class="ghost" data-i18n="side.reset">Clear all filters</button>
     </aside>
 
     <main>
       <section class="finder" aria-labelledby="finderTitle">
-        <h2 id="finderTitle">Help me choose</h2>
+        <h2 id="finderTitle" data-i18n="finder.title">Help me choose</h2>
         <div class="finder-q">
-          <span class="qlabel">1. What do you want to do?</span>
-          <div class="pills" id="fTask" role="group" aria-label="What do you want to do?"></div>
+          <span class="qlabel" data-i18n="finder.q1">1. What do you want to do?</span>
+          <div class="pills" id="fTask" role="group" data-i18n-aria="finder.q1" aria-label="What do you want to do?"></div>
         </div>
         <div class="finder-q">
-          <span class="qlabel">2. What computer will you use?</span>
-          <div class="pills" id="fHw" role="group" aria-label="What computer will you use?"></div>
+          <span class="qlabel" data-i18n="finder.q2">2. What computer will you use?</span>
+          <div class="pills" id="fHw" role="group" data-i18n-aria="finder.q2" aria-label="What computer will you use?"></div>
           <details class="specs" id="specs">
-            <summary>Set my exact computer</summary>
+            <summary data-i18n="specs.summary">Set my exact computer</summary>
             <div class="specs-row">
-              <label>Memory (RAM)
+              <label><span data-i18n="specs.ram">Memory (RAM)</span>
                 <select id="pcRam">
                   <option value="4">4 GB</option><option value="8">8 GB</option><option value="16">16 GB</option>
                   <option value="32">32 GB</option><option value="64">64 GB</option><option value="128">128 GB</option>
                 </select>
               </label>
-              <label>Graphics card memory
+              <label><span data-i18n="specs.vram">Graphics card memory</span>
                 <select id="pcVram">
                   <option value="0">No graphics card</option><option value="4">4 GB</option><option value="6">6 GB</option>
                   <option value="8">8 GB</option><option value="12">12 GB</option><option value="16">16 GB</option>
                   <option value="24">24 GB</option><option value="48">48 GB</option><option value="80">80 GB or more</option>
                 </select>
               </label>
-              <label class="opt"><input type="checkbox" id="pcMac"> Mac with Apple chip (M1 or newer)</label>
+              <label class="opt"><input type="checkbox" id="pcMac"> <span data-i18n="specs.mac">Mac with Apple chip (M1 or newer)</span></label>
             </div>
-            <p class="specs-help">Windows: Settings → System → About shows your RAM; Task Manager → Performance → GPU shows "Dedicated GPU memory". Mac: Apple menu → About This Mac.</p>
+            <p class="specs-help" data-i18n="specs.help">Windows: Settings → System → About shows your RAM; Task Manager → Performance → GPU shows "Dedicated GPU memory". Mac: Apple menu → About This Mac.</p>
           </details>
         </div>
         <div class="finder-q">
-          <span class="qlabel">3. Is it for a business?</span>
-          <div class="pills" id="fBiz" role="group" aria-label="Is it for a business?"></div>
+          <span class="qlabel" data-i18n="finder.q3">3. Is it for a business?</span>
+          <div class="pills" id="fBiz" role="group" data-i18n-aria="finder.q3" aria-label="Is it for a business?"></div>
         </div>
-        <h3 class="picks-title" id="fPicksTitle">Our top picks</h3>
+        <h3 class="picks-title" id="fPicksTitle" data-i18n="finder.picks">Our top picks</h3>
         <div id="fPicks" class="grid picks"></div>
-        <button id="fAll" class="ghost">See all matches</button>
+        <button id="fAll" class="ghost" data-i18n="finder.more">See more like these</button>
       </section>
 
       <div class="resultbar" id="resultsTop">
         <span id="resultCount" aria-live="polite"></span>
-        <label>Sort
+        <label><span data-i18n="sort">Sort</span>
           <select id="sort">
-            <option value="recommended">Recommended</option>
-            <option value="popular">Most popular</option>
-            <option value="name">Name A–Z</option>
+            <option value="recommended" data-i18n="sort.recommended">Recommended</option>
+            <option value="popular" data-i18n="sort.popular">Most popular</option>
+            <option value="name" data-i18n="sort.name">Name A–Z</option>
           </select>
         </label>
       </div>
       <div id="results" class="grid"></div>
-      <div class="more"><button id="more" class="ghost" hidden>Show more</button></div>
-      <p id="empty" class="empty" hidden>Nothing matches. Try fewer filters or a different word.</p>
+      <div class="more"><button id="more" class="ghost" hidden></button></div>
+      <p id="empty" class="empty" hidden data-i18n="empty">Nothing matches. Try fewer filters or a different word.</p>
     </main>
   </div>
 
@@ -114,35 +117,36 @@
       <span id="compareList"></span>
       <span id="compareNote" class="notice" role="status"></span>
       <div>
-        <button id="compareClear" class="ghost">Clear</button>
-        <button id="compareOpen" class="primary">Compare</button>
+        <button id="compareClear" class="ghost" data-i18n="compare.clear">Clear</button>
+        <button id="compareOpen" class="primary" data-i18n="compare.open">Compare</button>
       </div>
     </div>
   </div>
 
   <dialog id="compareDialog">
     <div class="dialog-head">
-      <h2>Side-by-side</h2>
-      <button id="compareClose" class="ghost" aria-label="Close">✕</button>
+      <h2 data-i18n="compare.title">Side-by-side</h2>
+      <button id="compareClose" class="ghost" data-i18n-aria="close" aria-label="Close">✕</button>
     </div>
     <div class="table-scroll"><table id="compareTable"></table></div>
   </dialog>
 
   <dialog id="howtoDialog" aria-labelledby="howtoTitle">
     <div class="dialog-head">
-      <h2 id="howtoTitle">How to use it</h2>
-      <button id="howtoClose" class="ghost" aria-label="Close">✕</button>
+      <h2 id="howtoTitle"></h2>
+      <button id="howtoClose" class="ghost" data-i18n-aria="close" aria-label="Close">✕</button>
     </div>
     <div class="howto-body" id="howtoBody"></div>
   </dialog>
 
   <footer class="wrap foot">
-    <p>Data from a hand-checked list plus the Hugging Face and GitHub public APIs. Only projects with a declared license are included.
+    <p data-i18n="foot.data">Data from a hand-checked list plus the Hugging Face and GitHub public APIs. Only projects with a declared license are included.
       Licenses are summarized for convenience; always read the actual license before commercial use.</p>
     <p id="generated"></p>
-    <p>Open source on <a href="https://github.com/alishahid74/OpenSourceAi" target="_blank" rel="noopener">GitHub</a>. Suggestions and additions welcome.</p>
+    <p id="footGithub">Open source on <a href="https://github.com/alishahid74/OpenSourceAi" target="_blank" rel="noopener">GitHub</a>. Suggestions and additions welcome.</p>
   </footer>
 
-  <script src="app.js?v=c9a17ad2e5"></script>
+  <script src="i18n.js?v=f939840ea5"></script>
+  <script src="app.js?v=c654ecba87"></script>
 </body>
 </html>

@@ -68,6 +68,12 @@ A static search & compare page: plain HTML, CSS and JavaScript with no build too
   `data/curated.json`. Each step is `{"t": text}`, `{"cmd": shell command}` or `{"code": code}`.
   Other entries get steps generated from their type (Ollama for GGUF files, Python for Transformers models, and so on).
 
+- **Languages**: English, Español, Français, Português, العربية, اردو, हिन्दी and 中文, chosen from the header
+  (it starts in the browser's language; `?lang=ur` in the link picks one). Arabic and Urdu switch the page to right-to-left.
+  The interface text lives in `site/i18n.js`; project descriptions and hand-written setup steps stay in English.
+  The translations were machine-written, so corrections from native speakers are welcome.
+  To add a language, copy the `en` block in `site/i18n.js`, translate it, and add it to `LANGS`.
+
 People can search in everyday words ("transcribe audio", "remove background"), filter by task, license, hardware,
 country and source, and compare up to 4 entries side by side. Filters are saved in the URL, so a search can be shared as a link.
 
