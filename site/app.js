@@ -53,7 +53,7 @@ const PAGE = 60;
 const MAX_COMPARE = 4;
 
 const $ = (id) => document.getElementById(id);
-const state = { q: "", cat: "", lic: new Set(), hw: new Set(), src: new Set(), country: "", sort: "recommended", shown: PAGE };
+const state = { q: "", cat: "", lic: new Set(), hw: new Set(), src: new Set(), country: "", fitsOnly: false, sort: "recommended", shown: PAGE };
 const compare = new Map();
 let items = [];
 
@@ -97,6 +97,7 @@ function filtered() {
     if (state.hw.size && !state.hw.has(e.hardware)) continue;
     if (state.src.size && !state.src.has(e.source)) continue;
     if (state.country && !(e.country || "").includes(state.country)) continue;
+    if (state.fitsOnly && fitFor(e)?.level === "no") continue;
     // Rank by how many words match (name matches count extra); allow one word to miss on longer queries.
     let score = 0;
     if (toks.length) {
@@ -123,6 +124,7 @@ function card(e, withCompare = true) {
   const lic = LICENSES[e.license_type] || LICENSES.custom;
   const hw = HARDWARE[e.hardware];
   const cat = CATEGORIES[e.category];
+  const fit = fitFor(e);
   const pop = e.stars ? `★ ${compact(e.stars)}` : e.downloads ? `↓ ${compact(e.downloads)}/mo` : "";
   const desc = e.description
     ? `<p class="desc">${esc(e.description)}</p>`
@@ -140,7 +142,8 @@ function card(e, withCompare = true) {
     <div class="tags">
       <span class="tag lic-${esc(e.license_type)}" title="${esc(e.license)}">${esc(lic.label)}</span>
       ${cat ? `<span class="tag">${esc(cat.label)}</span>` : ""}
-      ${hw && e.hardware !== "unknown" && e.hardware !== "n/a" ? `<span class="tag">${esc(hw.label)}</span>` : ""}
+      ${fit ? `<span class="tag fit-${fit.level}" title="Needs ${esc(fit.size)} of memory. Your computer: ${esc(pcSummary())}">${{ good: "✓", slow: "⚠", no: "✕" }[fit.level]} ${esc(fit.text)}</span>`
+        : hw && e.hardware !== "unknown" && e.hardware !== "n/a" ? `<span class="tag">${esc(hw.label)}</span>` : ""}
     </div>
     <div class="card-foot">
       <span>${esc(pop)}</span>
@@ -241,9 +244,13 @@ function openHowto(e) {
     "custom": "This project uses its own license. Read it before using this in a product.",
     "copyleft": "If you change this and share it, or run it as a service, you must share your changes under the same license.",
   }[e.license_type];
+  const fit = fitFor(e);
+  const fitLine = fit
+    ? `<p class="howto-meta"><span class="tag fit-${fit.level}">${esc(fit.text)}</span> Needs ${esc(fit.size)} of memory${memNeed(e).quant ? " (4-bit compressed, as Ollama runs it)" : ""}. Your computer: ${esc(pcSummary())}.</p>`
+    : "";
   $("howtoTitle").textContent = `How to use ${e.name}`;
   $("howtoBody").innerHTML =
-    `<p class="howto-meta">${esc(lic.label)} (${esc(e.license)})${hw && hw.label !== "Not sure" ? " · " + esc(hw.label) : ""}</p>` +
+    `<p class="howto-meta">${esc(lic.label)} (${esc(e.license)})${!fit && hw && hw.label !== "Not sure" ? " · " + esc(hw.label) : ""}</p>` + fitLine +
     `<ol>${steps.map((s) => `<li>${s.t ? `<p>${linkify(s.t)}</p>` : codeBox(s.cmd || s.code)}</li>`).join("")}</ol>` +
     (caution ? `<p class="caution">${esc(caution)}</p>` : "") +
     `<p class="howto-meta">Project page: <a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.url)}</a></p>`;
@@ -285,11 +292,12 @@ const FINDER = {
     { id: "music",      label: "Music & audio",          cats: ["audio-music"] },
     { id: "search",     label: "Search my documents",    cats: ["embeddings", "agents-rag", "vector-db"] },
   ],
+  // Each answer is a typical machine; "Set my exact computer" overrides it.
   hw: [
-    { id: 0, label: "Basic or older computer" },
-    { id: 1, label: "Modern laptop", note: "8–16 GB" },
-    { id: 2, label: "Gaming PC", note: "with graphics card" },
-    { id: 3, label: "Server or cloud" },
+    { id: 0, label: "Basic or older computer", ram: 8, vram: 0 },
+    { id: 1, label: "Modern laptop", note: "8–16 GB", ram: 16, vram: 0 },
+    { id: 2, label: "Gaming PC", note: "with graphics card", ram: 32, vram: 12 },
+    { id: 3, label: "Server or cloud", ram: 256, vram: 80 },
   ],
   biz: [
     { id: "no", label: "No, personal or study" },
@@ -298,6 +306,83 @@ const FINDER = {
 };
 const finder = { task: "chat", hw: 1, biz: "no" };
 
+// ---- will it run on my computer? ----
+
+const pc = { ram: 16, vram: 0, mac: false };
+const PC_KEY = "opensourceai.pc";
+
+function loadPC() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PC_KEY) || "null");
+    if (saved && typeof saved.ram === "number") Object.assign(pc, saved);
+  } catch { /* storage unavailable */ }
+  finder.hw = presetFor(pc) ?? tierFor(pc);
+}
+
+function savePC() {
+  try { localStorage.setItem(PC_KEY, JSON.stringify(pc)); } catch { /* storage unavailable */ }
+}
+
+function presetFor(p) {
+  const hit = FINDER.hw.find((o) => o.ram === p.ram && o.vram === p.vram && !p.mac);
+  return hit ? hit.id : null;
+}
+
+// Rough tier for entries without a known size.
+function tierFor(p) {
+  const gpu = p.mac ? p.ram * 0.7 : p.vram;
+  if (gpu >= 40) return 3;
+  if (gpu >= 6) return 2;
+  return p.ram >= 16 ? 1 : 0;
+}
+
+// Chat-style models are usually run 4-bit compressed (Ollama, llama.cpp): ~0.6 bytes per parameter.
+// Everything else is assumed to run at 16-bit: 2 bytes per parameter. Plus room for working memory.
+const QUANT_CATS = new Set(["llm", "code-llm", "vision-language"]);
+
+function memNeed(e) {
+  if (!e.params) return null;
+  const quant = e.library === "gguf" || /gguf/i.test(e.name) || QUANT_CATS.has(e.category);
+  const gb = (e.params * (quant ? 0.6 : 2)) / 1e9 + (quant ? 1 : 0.5);
+  return { gb, quant, gpuOnly: e.category === "image-gen" || e.category === "video-gen" };
+}
+
+function fitFor(e) {
+  const need = memNeed(e);
+  if (!need) return null;
+  const gpu = pc.mac ? pc.ram * 0.7 : pc.vram;
+  const size = need.gb < 1 ? "under 1 GB" : `~${need.gb < 10 ? need.gb.toFixed(1) : Math.round(need.gb)} GB`;
+  if (gpu && need.gb <= gpu * 0.9) return { level: "good", text: "Runs well", size };
+  if (need.gpuOnly) {
+    return need.gb <= pc.ram * 0.75
+      ? { level: "slow", text: "Very slow without a GPU", size }
+      : { level: "no", text: "Too big", size };
+  }
+  if (need.gb <= Math.min(4, pc.ram * 0.5)) return { level: "good", text: "Runs well", size };
+  if (need.gb <= pc.ram * 0.75) return { level: "slow", text: "Runs slowly", size };
+  return { level: "no", text: "Too big", size };
+}
+
+function pcSummary() {
+  const gpu = pc.mac ? "Apple chip" : pc.vram ? `${pc.vram} GB graphics card` : "no graphics card";
+  return `${pc.ram} GB RAM, ${gpu}`;
+}
+
+function syncPCControls() {
+  $("pcRam").value = String(pc.ram);
+  $("pcVram").value = String(pc.vram);
+  $("pcMac").checked = pc.mac;
+  $("pcVram").disabled = pc.mac;
+  $("pcSummary").textContent = pcSummary();
+}
+
+function pcChanged() {
+  savePC();
+  syncPCControls();
+  renderFinder();
+  rerender();
+}
+
 function finderMatches() {
   const t = FINDER.task.find((x) => x.id === finder.task);
   const out = [];
@@ -305,8 +390,9 @@ function finderMatches() {
   const seen = new Set(items.filter((e) => e.source === "curated").map((e) => e.name.toLowerCase()));
   for (const e of items) {
     if (e.source !== "curated" && seen.has(e.name.toLowerCase())) continue;
-    const rank = HW_RANK[e.hardware];
-    if (rank === undefined || rank > finder.hw) continue;
+    // Use the real size when known; otherwise the rough hardware tier.
+    const fit = fitFor(e);
+    if (fit ? fit.level === "no" : !(HW_RANK[e.hardware] <= finder.hw)) continue;
     if (finder.biz === "yes" && (e.license_type === "non-commercial" || e.license_type === "custom")) continue;
     // Main category only: GitHub topic tags put general libraries into many extra categories.
     // Apps (like ComfyUI) count for the tasks they list.
@@ -317,7 +403,8 @@ function finderMatches() {
     if (e.source !== "curated") seen.add(e.name.toLowerCase());
     // Prefer hand-picked entries with written steps (easy ones first: no compiling), then popularity.
     const hard = e.howto && e.howto.some((s) => /cmake|git clone|docker/.test(s.cmd || ""));
-    const score = (e.source === "curated" ? 4e12 : 0) + (e.howto ? 2e12 : 0) + (e.howto && !hard ? 1e12 : 0) + e._pop;
+    const score = (e.source === "curated" ? 4e12 : 0) + (e.howto ? 2e12 : 0) + (e.howto && !hard ? 1e12 : 0)
+      + (fit && fit.level === "slow" ? -5e11 : 0) + e._pop;
     out.push([e, score]);
   }
   out.sort((a, b) => b[1] - a[1]);
@@ -325,10 +412,15 @@ function finderMatches() {
 }
 
 function renderFinder() {
+  const preset = presetFor(pc);
   for (const [key, el] of [["task", "fTask"], ["hw", "fHw"], ["biz", "fBiz"]]) {
+    const current = key === "hw" ? preset : finder[key];
     $(el).innerHTML = FINDER[key].map((o) =>
-      `<button class="pill" data-key="${key}" data-val="${o.id}" aria-pressed="${String(o.id === finder[key])}">${esc(o.label)}${o.note ? `<small>${esc(o.note)}</small>` : ""}</button>`
+      `<button class="pill" data-key="${key}" data-val="${o.id}" aria-pressed="${String(o.id === current)}">${esc(o.label)}${o.note ? `<small>${esc(o.note)}</small>` : ""}</button>`
     ).join("");
+  }
+  if (preset === null) {
+    $("fHw").insertAdjacentHTML("beforeend", `<button class="pill" aria-pressed="true" disabled>My computer<small>${esc(pcSummary())}</small></button>`);
   }
   const list = finderMatches();
   $("fPicks").innerHTML = list.slice(0, 3).map((e) => card(e, false)).join("") ||
@@ -346,6 +438,7 @@ function finderToFilters() {
   state.lic = finder.biz === "yes" ? new Set(["permissive", "copyleft", "restricted-open-weight"]) : new Set();
   state.src = new Set();
   state.country = "";
+  state.fitsOnly = true;
   syncControls();
   rerender();
   $("resultsTop").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -414,6 +507,7 @@ function buildFilters() {
 function syncControls() {
   $("q").value = state.q;
   $("sort").value = state.sort;
+  $("fitsOnly").checked = state.fitsOnly;
   $("country").value = state.country;
   for (const [id, set] of [["licenseFilter", state.lic], ["hardwareFilter", state.hw], ["sourceFilter", state.src]]) {
     for (const input of $(id).querySelectorAll("input")) input.checked = set.has(input.value);
@@ -462,7 +556,7 @@ function openCompare() {
     ["What it does", (e) => esc(e.description) || esc((e.tasks || []).join(", ")) || "—"],
     ["Category", (e) => esc(e._cats.map((c) => CATEGORIES[c]?.label || c).join(", "))],
     ["License", (e) => `<span class="tag lic-${esc(e.license_type)}">${esc((LICENSES[e.license_type] || LICENSES.custom).label)}</span><br><small>${esc(e.license)}</small>`],
-    ["Runs on", (e) => esc(HARDWARE[e.hardware]?.label || e.hardware)],
+    ["On your computer", (e) => { const f = fitFor(e); return f ? `<span class="tag fit-${f.level}">${esc(f.text)}</span><br><small>Needs ${esc(f.size)}</small>` : esc(HARDWARE[e.hardware]?.label || e.hardware); }],
     ["Popularity", (e) => [e.stars && `★ ${compact(e.stars)} stars`, e.downloads && `↓ ${compact(e.downloads)} downloads/mo`, e.likes && `♥ ${compact(e.likes)} likes`].filter(Boolean).join("<br>") || "—"],
     ["Language", (e) => esc(e.language || e.library) || "—"],
     ["Link", (e) => `<a href="${esc(e.url)}" target="_blank" rel="noopener">Open ↗</a>`],
@@ -486,7 +580,7 @@ function wire() {
   $("country").addEventListener("change", (ev) => { state.country = ev.target.value; rerender(); });
   $("more").addEventListener("click", () => { state.shown += PAGE; render(); });
   $("reset").addEventListener("click", () => {
-    Object.assign(state, { q: "", cat: "", lic: new Set(), hw: new Set(), src: new Set(), country: "", sort: "recommended" });
+    Object.assign(state, { q: "", cat: "", lic: new Set(), hw: new Set(), src: new Set(), country: "", fitsOnly: false, sort: "recommended" });
     syncControls();
     rerender();
   });
@@ -517,13 +611,27 @@ function wire() {
   document.addEventListener("click", (ev) => {
     const how = ev.target.closest("[data-howto]");
     if (how) { openHowto(items[+how.dataset.howto]); return; }
-    const pill = ev.target.closest(".pill");
+    const pill = ev.target.closest(".pill[data-key]");
     if (pill) {
       const { key, val } = pill.dataset;
-      finder[key] = key === "hw" ? +val : val;
-      renderFinder();
+      if (key === "hw") {
+        const o = FINDER.hw[+val];
+        Object.assign(pc, { ram: o.ram, vram: o.vram, mac: false });
+        finder.hw = o.id;
+        pcChanged();
+      } else {
+        finder[key] = val;
+        renderFinder();
+      }
     }
   });
+  const specChanged = () => {
+    Object.assign(pc, { ram: +$("pcRam").value, vram: $("pcMac").checked ? 0 : +$("pcVram").value, mac: $("pcMac").checked });
+    finder.hw = presetFor(pc) ?? tierFor(pc);
+    pcChanged();
+  };
+  for (const id of ["pcRam", "pcVram", "pcMac"]) $(id).addEventListener("change", specChanged);
+  $("fitsOnly").addEventListener("change", (ev) => { state.fitsOnly = ev.target.checked; rerender(); });
   $("fAll").addEventListener("click", finderToFilters);
   $("howtoBody").addEventListener("click", (ev) => { if (ev.target.matches("[data-copy]")) copyCode(ev.target); });
   $("howtoClose").addEventListener("click", () => $("howtoDialog").close());
@@ -542,6 +650,8 @@ async function main() {
     buildFilters();
     loadHash();
     syncControls();
+    loadPC();
+    syncPCControls();
     wire();
     renderFinder();
     render();

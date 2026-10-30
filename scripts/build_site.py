@@ -12,7 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 KEEP = ("name", "org", "country", "category", "also_in", "tasks", "license", "license_type",
-        "url", "hardware", "description", "source", "downloads", "likes", "stars", "language", "library", "howto")
+        "url", "hardware", "description", "source", "downloads", "likes", "stars", "language", "library", "howto", "params")
 
 
 def key(entry):
@@ -26,7 +26,7 @@ def main():
     for e in catalog["items"]:
         c = curated.get(key(e))
         if c:
-            for field in ("downloads", "likes", "stars", "language", "library", "also_in"):
+            for field in ("downloads", "likes", "stars", "language", "library", "also_in", "params"):
                 if e.get(field) is not None:
                     c.setdefault(field, e[field])
     items = list(curated.values())

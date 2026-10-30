@@ -28,6 +28,11 @@
   <div class="wrap layout">
     <aside id="filters" class="filters">
       <section>
+        <h2>Your computer</h2>
+        <label class="opt"><input type="checkbox" id="fitsOnly">
+          <span>Hide what's too big<small id="pcSummary">Set in "Help me choose"</small></span></label>
+      </section>
+      <section>
         <h2>License</h2>
         <div id="licenseFilter"></div>
       </section>
@@ -58,6 +63,26 @@
         <div class="finder-q">
           <span class="qlabel">2. What computer will you use?</span>
           <div class="pills" id="fHw" role="group" aria-label="What computer will you use?"></div>
+          <details class="specs" id="specs">
+            <summary>Set my exact computer</summary>
+            <div class="specs-row">
+              <label>Memory (RAM)
+                <select id="pcRam">
+                  <option value="4">4 GB</option><option value="8">8 GB</option><option value="16">16 GB</option>
+                  <option value="32">32 GB</option><option value="64">64 GB</option><option value="128">128 GB</option>
+                </select>
+              </label>
+              <label>Graphics card memory
+                <select id="pcVram">
+                  <option value="0">No graphics card</option><option value="4">4 GB</option><option value="6">6 GB</option>
+                  <option value="8">8 GB</option><option value="12">12 GB</option><option value="16">16 GB</option>
+                  <option value="24">24 GB</option><option value="48">48 GB</option><option value="80">80 GB or more</option>
+                </select>
+              </label>
+              <label class="opt"><input type="checkbox" id="pcMac"> Mac with Apple chip (M1 or newer)</label>
+            </div>
+            <p class="specs-help">Windows: Settings → System → About shows your RAM; Task Manager → Performance → GPU shows "Dedicated GPU memory". Mac: Apple menu → About This Mac.</p>
+          </details>
         </div>
         <div class="finder-q">
           <span class="qlabel">3. Is it for a business?</span>

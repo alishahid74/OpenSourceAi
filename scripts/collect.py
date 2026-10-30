@@ -30,6 +30,8 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 USER_AGENT = "OpenSourceAi-catalog/0.1"
 
+HF_FIELDS = ("downloads", "likes", "tags", "pipeline_tag", "library_name", "createdAt", "safetensors", "gguf")
+
 # Hugging Face pipeline tag -> our category
 HF_TASKS = {
     "text-generation": "llm",
@@ -137,12 +139,17 @@ def next_link(headers):
     return m.group(1) if m else None
 
 
-def hardware_from_name(model_id):
-    """Rough guess at what hardware is needed, from a parameter count in the model name."""
+def params_from_name(model_id):
+    """Parameter count from the model name, e.g. "Llama-3.1-8B" -> 8e9, or None."""
     m = re.search(r"(\d+(?:\.\d+)?)\s*[bB](?![a-z])", model_id.split("/")[-1])
-    if not m:
+    return int(float(m.group(1)) * 1e9) if m else None
+
+
+def hardware_tier(params):
+    """Rough hardware tier from a parameter count."""
+    if not params:
         return "unknown"
-    billions = float(m.group(1))
+    billions = params / 1e9
     if billions <= 2:
         return "cpu"
     if billions <= 9:
@@ -155,8 +162,10 @@ def hardware_from_name(model_id):
 def fetch_huggingface(per_task):
     out = []
     for task, category in HF_TASKS.items():
-        params = urllib.parse.urlencode({"pipeline_tag": task, "sort": "downloads", "direction": -1, "limit": min(per_task, 1000)})
-        url = f"https://huggingface.co/api/models?{params}"
+        query = urllib.parse.urlencode({"pipeline_tag": task, "sort": "downloads", "direction": -1, "limit": min(per_task, 1000)})
+        # expand[] replaces the default fields, so list every field we use.
+        query += "".join(f"&expand[]={f}" for f in HF_FIELDS)
+        url = f"https://huggingface.co/api/models?{query}"
         got = 0
         while url and got < per_task:
             items, headers = get_json(url)
@@ -167,6 +176,10 @@ def fetch_huggingface(per_task):
                 if ltype is None:
                     continue
                 org, _, name = m["id"].partition("/")
+                # Real parameter count: safetensors weights, else GGUF metadata, else the name.
+                n_params = ((m.get("safetensors") or {}).get("total")
+                            or (m.get("gguf") or {}).get("total")
+                            or params_from_name(m["id"]))
                 out.append({
                     "name": name or m["id"],
                     "org": org if name else "",
@@ -176,7 +189,8 @@ def fetch_huggingface(per_task):
                     "license": lic,
                     "license_type": ltype,
                     "url": f"https://huggingface.co/{m['id']}",
-                    "hardware": hardware_from_name(m["id"]),
+                    "hardware": hardware_tier(n_params),
+                    "params": n_params,
                     "description": "",
                     "source": "huggingface",
                     "downloads": m.get("downloads", 0),
@@ -248,7 +262,7 @@ def merge(curated, fetched):
         if k in by_url:
             existing = by_url[k]
             # keep curated text, but pick up live popularity numbers
-            for field in ("downloads", "likes", "stars", "language", "updated", "library", "created"):
+            for field in ("downloads", "likes", "stars", "language", "updated", "library", "created", "params"):
                 if e.get(field) is not None and field not in existing:
                     existing[field] = e[field]
             if e["category"] != existing["category"]:

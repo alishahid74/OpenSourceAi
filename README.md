@@ -59,6 +59,11 @@ plus `downloads`/`likes` (Hugging Face) or `stars`/`language`/`updated` (GitHub)
 A static search & compare page: plain HTML, CSS and JavaScript with no build tools.
 
 - **Help me choose**: three questions (task, computer, business use) give the top 3 picks.
+- **Will it run on my computer?**: visitors pick a typical computer or set their exact RAM and graphics card memory.
+  Every model with a known size shows "Runs well", "Runs slowly" or "Too big". The estimate uses the real parameter
+  count from Hugging Face (`params`): about 0.6 bytes per parameter for chat models (4-bit compressed, the way Ollama
+  runs them) and 2 bytes for others, plus working memory. Image and video models are treated as needing a graphics card.
+  The settings are saved in the visitor's browser.
 - **How to use**: every entry has setup steps with copy buttons. Hand-picked entries use the `howto` steps in
   `data/curated.json`. Each step is `{"t": text}`, `{"cmd": shell command}` or `{"code": code}`.
   Other entries get steps generated from their type (Ollama for GGUF files, Python for Transformers models, and so on).

@@ -152,6 +152,14 @@ button, input, select { font: inherit; color: inherit; }
 .pill:hover { border-color: var(--accent); }
 .pill[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
 .pill small { opacity: .75; margin-left: 4px; }
+.specs summary { cursor: pointer; color: var(--accent); font-size: 14px; width: fit-content; }
+.specs-row { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: end; margin-top: 8px; }
+.specs-row label:not(.opt) { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+.specs-row select { padding: 6px 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+.specs-help { color: var(--muted); font-size: 12px; margin: 8px 0 0; max-width: 65ch; }
+.tag.fit-good { background: var(--accent-soft); color: var(--accent); border-color: transparent; font-weight: 700; }
+.tag.fit-slow { background: var(--warn-soft); color: var(--warn); border-color: transparent; font-weight: 700; }
+.tag.fit-no { background: var(--bad-soft); color: var(--bad); border-color: transparent; font-weight: 700; }
 .picks-title { margin: 6px 0 0; font: 700 15px/1.3 var(--font-display); color: var(--muted); }
 .picks .card { background: var(--bg); }
 #fAll { justify-self: start; }
