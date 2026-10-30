@@ -71,6 +71,8 @@ GH_TOPICS = {
     "local-llm": "inference",
     "ai-agents": "agents-rag",
     "rag": "agents-rag",
+    "deep-research": "research",
+    "llm-security": "security",
     "vector-database": "vector-db",
     "stable-diffusion": "image-gen",
     "computer-vision": "vision",

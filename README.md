@@ -9,7 +9,7 @@ A catalog of the world's open-source AI (models, tools, frameworks, datasets), b
 
 | Path | What it is |
 |---|---|
-| `data/curated.json` | ~120 hand-checked notable projects from the USA, China, France, Germany, UAE, India, Singapore, Korea and elsewhere, with plain-language descriptions |
+| `data/curated.json` | ~145 hand-checked notable projects, including research assistants and cybersecurity tools, from the USA, China, France, Germany, UAE, India, Singapore, Korea and elsewhere, with plain-language descriptions |
 | `scripts/collect.py` | Pulls the most-downloaded models from Hugging Face and most-starred AI repos from GitHub, then merges them with the curated list |
 | `data/catalog.json` | The generated catalog (`stats` + `items`). Rebuild it any time |
 | `scripts/build_site.py` | Writes a compact copy of the catalog to `site/catalog.json` |

@@ -15,6 +15,8 @@ const CATEGORIES = {
   "embeddings":      "search semantic embeddings similarity retrieval vector",
   "ocr":             "ocr scan document pdf read text extract receipt handwriting",
   "agents-rag":      "agent agents rag automation workflow assistant documents chatbot",
+  "research":        "research deep report sources citations papers paper literature scholar academic science answer engine perplexity",
+  "security":        "security cybersecurity cyber pentest pentesting penetration hacking hacker vulnerability vulnerabilities red team prompt injection jailbreak cve exploit bug bounty fuzzing",
   "inference":       "local offline run server serve private inference",
   "app-ui":          "app ui interface desktop webui gui",
   "vector-db":       "vector database search store",
@@ -232,6 +234,7 @@ function openHowto(e) {
     (e.howto && LANG !== "en" ? `<p class="howto-meta">${esc(t("howto.english"))}</p>` : "") +
     `<ol>${steps.map((s) => `<li>${s.t ? `<p>${linkify(s.t)}</p>` : codeBox(s.cmd || s.code)}</li>`).join("")}</ol>` +
     (caution ? `<p class="caution">${esc(caution)}</p>` : "") +
+    (e.category === "security" ? `<p class="caution">${esc(t("caution.security"))}</p>` : "") +
     `<p class="howto-meta">${esc(t("howto.page"))} <a href="${esc(e.url)}" target="_blank" rel="noopener" dir="ltr">${esc(e.url)}</a></p>`;
   $("howtoDialog").showModal();
 }
@@ -270,6 +273,8 @@ const FINDER = {
     { id: "detect",     cats: ["vision"] },
     { id: "music",      cats: ["audio-music"] },
     { id: "search",     cats: ["embeddings", "agents-rag", "vector-db"] },
+    { id: "research",   cats: ["research"] },
+    { id: "security",   cats: ["security"] },
   ],
   // Labels are "task.<id>", "hwq.<id>" and "biz.<id>" in i18n.js. Each computer answer is a typical machine; "Set my exact computer" overrides it.
   hw: [
@@ -317,7 +322,7 @@ function tierFor(p) {
 
 // Chat-style models are usually run 4-bit compressed (Ollama, llama.cpp): ~0.6 bytes per parameter.
 // Everything else is assumed to run at 16-bit: 2 bytes per parameter. Plus room for working memory.
-const QUANT_CATS = new Set(["llm", "code-llm", "vision-language"]);
+const QUANT_CATS = new Set(["llm", "code-llm", "vision-language", "research", "security"]);
 
 function memNeed(e) {
   if (!e.params) return null;
