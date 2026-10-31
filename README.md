@@ -83,6 +83,9 @@ A static search & compare page: plain HTML, CSS and JavaScript with no build too
 - **Your computer's AI menu** (`site/menu.html`, `site/menu.js`): the finder's best pick for every task on one computer,
   with "How to use" steps and two alternatives. It guesses the computer from the browser (or uses the visitor's saved
   settings), can be printed or saved as a PDF, and can be shared as a link (`?ram=32&vram=12&mac=0&biz=1`).
+- **Shared header and footer**: every page gets the same header (logo, menu, language picker), footer and link-preview
+  tags from `scripts/build_site.py`, which fills the `<!-- site-header -->`, `<!-- site-footer -->` and `<!-- site-meta -->`
+  markers. To add a page, add it to `PAGES` there and give it those markers. The build also writes `sitemap.xml` and `robots.txt`.
 - **Languages**: English, Español, Français, Português, العربية, اردو, हिन्दी and 中文, chosen from the header
   (it starts in the browser's language; `?lang=ur` in the link picks one). Arabic and Urdu switch the page to right-to-left.
   The interface text lives in `site/i18n.js`; project descriptions and hand-written setup steps stay in English.

@@ -8,29 +8,53 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap">
-  <link rel="stylesheet" href="style.css?v=fb6993f8a5">
+  <link rel="stylesheet" href="style.css?v=c4348c84fa">
+  <!-- site-meta -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#1f6f5c">
+  <link rel="canonical" href="https://alishahid74.github.io/OpenSourceAi/chat.html">
+  <meta property="og:url" content="https://alishahid74.github.io/OpenSourceAi/chat.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="OpenSourceAi">
+  <meta property="og:title" content="Chat · OpenSourceAi">
+  <meta property="og:description" content="Chat with open-source AI for free. The model downloads once and runs inside the page on your own computer, so nothing you type leaves it.">
+  <meta property="og:image" content="https://alishahid74.github.io/OpenSourceAi/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- /site-meta -->
 </head>
 <body>
+  <a class="skip" href="#main" data-i18n="skip">Skip to content</a>
+  <!-- site-header -->
+  <header class="site-header">
+    <div class="wrap site-bar">
+      <a class="brand" href="index.html" data-page="index.html"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M22.6 10.4A8.5 8.5 0 1 0 24.5 16" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="23.2" cy="8.8" r="2.3" fill="#fff"/></svg><span>OpenSourceAi</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav" data-i18n-aria="nav.toggle" aria-label="Menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <nav id="siteNav" class="site-nav" data-i18n-aria="nav.main" aria-label="Main menu">
+        <a href="index.html" data-page="index.html" data-i18n="nav.find">Find AI</a>
+        <a href="chat.html" data-page="chat.html" data-i18n="nav.chatShort" aria-current="page">Chat</a>
+        <a href="try.html" data-page="try.html" data-i18n="nav.tryShort">Try in browser</a>
+        <a href="tree.html" data-page="tree.html" data-i18n="nav.treeShort">Family tree</a>
+        <a href="menu.html" data-page="menu.html" data-i18n="nav.menuShort">My AI menu</a>
+      </nav>
+      <label class="langpick"><span class="sr-only" data-i18n="language">Language</span>
+        <select id="lang"></select>
+      </label>
+    </div>
+  </header>
+  <!-- /site-header -->
   <header class="top">
     <div class="wrap">
-      <div class="top-row">
-        <h1><a class="home" href="index.html" data-page="index.html">OpenSourceAi</a></h1>
-        <label class="langpick"><span class="sr-only" data-i18n="language">Language</span>
-          <select id="lang"></select>
-        </label>
-      </div>
-      <nav class="toplinks">
-        <a href="index.html" data-page="index.html" data-i18n="try.back">← All projects</a>
-        <a href="try.html" data-page="try.html" data-i18n="try.link">Try AI in your browser →</a>
-        <a href="tree.html" data-page="tree.html" data-i18n="nav.tree">Family tree of open AI</a>
-        <a href="menu.html" data-page="menu.html" data-i18n="nav.menu">Your computer's AI menu</a>
-      </nav>
-      <h2 class="try-title" data-i18n="chat.title">Chat with open AI, free and private</h2>
+      <h1 class="try-title" data-i18n="chat.title">Chat with open AI, free and private</h1>
       <p class="tagline" data-i18n="chat.intro"></p>
     </div>
   </header>
 
-  <main class="wrap chat-page">
+  <main id="main" class="wrap chat-page">
     <p id="support" class="chat-support" role="status" data-i18n="chat.checking"></p>
 
     <section class="demo chat-models" aria-labelledby="pickTitle">
@@ -59,8 +83,40 @@
       <p class="demo-meta" data-i18n="chat.warn"></p>
     </section>
   </main>
+  <!-- site-footer -->
+  <footer class="site-footer">
+    <div class="wrap foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="index.html" data-page="index.html"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M22.6 10.4A8.5 8.5 0 1 0 24.5 16" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="23.2" cy="8.8" r="2.3" fill="#fff"/></svg><span>OpenSourceAi</span></a>
+        <p data-i18n="foot.tagline">Open-source AI, explained simply.</p>
+        <p data-i18n="foot.privacy">No accounts, no ads, no tracking.</p>
+      </div>
+      <nav class="foot-col" aria-labelledby="footExplore">
+        <h2 id="footExplore" data-i18n="foot.explore">Explore</h2>
+          <a href="index.html" data-page="index.html" data-i18n="nav.find">Find AI</a>
+          <a href="chat.html" data-page="chat.html" data-i18n="nav.chatShort">Chat</a>
+          <a href="try.html" data-page="try.html" data-i18n="nav.tryShort">Try in browser</a>
+          <a href="tree.html" data-page="tree.html" data-i18n="nav.treeShort">Family tree</a>
+          <a href="menu.html" data-page="menu.html" data-i18n="nav.menuShort">My AI menu</a>
+      </nav>
+      <div class="foot-col">
+        <h2 data-i18n="foot.about">About</h2>
+        <a href="https://github.com/alishahid74/OpenSourceAi#rules-for-what-counts-as-open-source" data-i18n="foot.licenses">How we check licenses</a>
+        <a href="https://github.com/alishahid74/OpenSourceAi#whats-here" data-i18n="foot.sources">Where the data comes from</a>
+      </div>
+      <div class="foot-col">
+        <h2 data-i18n="foot.project">Project</h2>
+        <a href="https://github.com/alishahid74/OpenSourceAi" data-i18n="foot.code">Source code on GitHub</a>
+        <a href="https://github.com/alishahid74/OpenSourceAi/issues/new?title=Suggest%20a%20project" data-i18n="foot.suggest">Suggest a project</a>
+        <a href="https://github.com/alishahid74/OpenSourceAi/issues/new" data-i18n="foot.report">Report a problem</a>
+      </div>
+    </div>
+    <div class="wrap foot-bottom"><span>© 2026 OpenSourceAi</span><span data-i18n="foot.mit">Site code under the MIT License.</span></div>
+  </footer>
+  <!-- /site-footer -->
 
-  <script src="i18n.js?v=96eaf0521e"></script>
+
+  <script src="i18n.js?v=74dc4ce9b0"></script>
   <script type="module" src="chat.js?v=d45943e73d"></script>
 </body>
 </html>
