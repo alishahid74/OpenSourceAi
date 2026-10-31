@@ -11,6 +11,10 @@ const MODELS = [
   { id: "SmolLM2-360M-Instruct-q4f16_1-MLC", name: "SmolLM2 360M", gb: 0.4, about: "chat.m.smol" },
 ];
 const MODEL_KEY = "opensourceai.chatModel";
+// Where downloads are kept: the browser's Cache Storage by default, or IndexedDB once Cache Storage has failed on this browser.
+const STORE_KEY = "opensourceai.chatStore";
+// A model is dozens of files; if one drops, the ones already saved are kept, so trying again carries on from there.
+const TRIES = 3;
 const SYSTEM = "You are a helpful, friendly assistant. Answer in the same language the user writes in. Keep answers clear and not too long.";
 // The models remember about 4,000 tokens, so older turns are dropped to keep the conversation under this many characters.
 const HISTORY_CHARS = 6000;
@@ -25,6 +29,9 @@ let history = [];      // {role, content}
 let busy = false;      // a download or an answer is in progress
 let cached = new Set();
 let lastLoad = null;   // [key, vars] of the last load message, so a language change can redraw it
+let store = "cache";
+
+try { if (localStorage.getItem(STORE_KEY) === "indexeddb") store = "indexeddb"; } catch { /* storage unavailable */ }
 
 try { chosen = MODELS.find((m) => m.id === localStorage.getItem(MODEL_KEY)) || chosen; } catch { /* storage unavailable */ }
 
@@ -37,6 +44,15 @@ async function checkSupport() {
 
 // WebLLM keeps each model's files in the "webllm/model" cache, under the model's Hugging Face address.
 async function findCached() {
+  if (store === "indexeddb") {
+    try {
+      webllm ??= await import(WEBLLM);
+      const appConfig = { ...webllm.prebuiltAppConfig, cacheBackend: store };
+      const hits = await Promise.all(MODELS.map((m) => webllm.hasModelInCache(m.id, appConfig)));
+      cached = new Set(MODELS.filter((m, i) => hits[i]).map((m) => m.id));
+    } catch { cached = new Set(); }
+    return;
+  }
   try {
     const keys = await (await caches.open("webllm/model")).keys();
     cached = new Set(MODELS.filter((m) => keys.some((r) => r.url.includes(`/${m.id}/`))).map((m) => m.id));
@@ -55,6 +71,10 @@ function renderModels() {
   $("start").hidden = ready;
   $("start").disabled = busy;
   $("modelName").textContent = loadedId ? MODELS.find((m) => m.id === loadedId).name : "";
+}
+
+function isDownloadError(err) {
+  return /network|fetch|Cache|load failed|Cannot fetch/i.test(String(err?.message || err));
 }
 
 function loadMessage(key, vars) {
@@ -78,11 +98,31 @@ async function start() {
       if (!/^Fetching/.test(r.text || "")) loadMessage("chat.opening", { name: model.name });
       else loadMessage("chat.downloading", { name: model.name, pct: Math.round((r.progress || 0) * 100) });
     };
-    if (engine) {
-      engine.setInitProgressCallback(progress);
-      await engine.reload(model.id);
-    } else {
-      engine = await webllm.CreateMLCEngine(model.id, { initProgressCallback: progress });
+    for (let attempt = 1; ; attempt++) {
+      try {
+        if (engine) {
+          engine.setInitProgressCallback(progress);
+          await engine.reload(model.id);
+        } else {
+          engine = await webllm.CreateMLCEngine(model.id, {
+            initProgressCallback: progress,
+            appConfig: { ...webllm.prebuiltAppConfig, cacheBackend: store },
+          });
+        }
+        break;
+      } catch (err) {
+        if (!isDownloadError(err) || attempt >= TRIES) throw err;
+        console.warn(err);
+        loadMessage("chat.retrying", { n: attempt, total: TRIES - 1 });
+        await new Promise((r) => setTimeout(r, 2000 * attempt));
+        // Last try: keep the files in IndexedDB instead, which works where Cache Storage keeps failing.
+        if (attempt === TRIES - 1 && store === "cache") {
+          store = "indexeddb";
+          try { localStorage.setItem(STORE_KEY, store); } catch { /* storage unavailable */ }
+          await engine?.unload().catch(() => {});
+          engine = null;
+        }
+      }
     }
     loadedId = model.id;
     cached.add(model.id);
@@ -91,7 +131,8 @@ async function start() {
     loadMessage("chat.loaded", { name: model.name });
   } catch (err) {
     console.error(err);
-    loadMessage(/memory|OOM|allocation/i.test(String(err)) ? "chat.memory" : "chat.error", { msg: err.message || String(err) });
+    const key = /memory|OOM|allocation/i.test(String(err)) ? "chat.memory" : isDownloadError(err) ? "chat.netError" : "chat.error";
+    loadMessage(key, { msg: err.message || String(err) });
   } finally {
     busy = false;
     $("loadBar").hidden = true;
