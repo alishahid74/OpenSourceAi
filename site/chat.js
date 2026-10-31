@@ -91,6 +91,8 @@ async function start() {
   $("loadBar").value = 0;
   loadMessage("chat.opening", { name: model.name });
   try {
+    // Ask the browser not to clear the downloaded models when the disk gets full.
+    navigator.storage?.persist?.().catch(() => {});
     webllm ??= await import(WEBLLM);
     const progress = (r) => {
       $("loadBar").value = r.progress || 0;
@@ -141,10 +143,64 @@ async function start() {
   }
 }
 
-// Answers are plain text; only code blocks get their own box.
+// Models answer in Markdown. This turns the common parts (bold, italics, code, lists, headings, quotes, links)
+// into HTML. Everything is escaped first, so nothing the model writes can add its own HTML to the page.
+const escHTML = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function inline(text) {
+  const codes = [];
+  let s = escHTML(text).replace(/`([^`]+)`/g, (_, c) => `\u0000${codes.push(c) - 1}\u0000`);
+  s = s
+    .replace(/\*\*(.+?)\*\*|__(.+?)__/g, (_, a, b) => `<strong>${a ?? b}</strong>`)
+    .replace(/(^|[^*\w])\*(?!\s)(.+?)\*(?!\w)/g, "$1<em>$2</em>")
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener nofollow">$1</a>');
+  return s.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code dir="ltr">${codes[i]}</code>`);
+}
+
+function blocks(text) {
+  const out = [];
+  let list = null;      // {tag, start, items}
+  let para = [];
+  const flushPara = () => { if (para.length) out.push(`<p>${para.map(inline).join("<br>")}</p>`); para = []; };
+  const flushList = () => {
+    if (!list) return;
+    const start = list.tag === "ol" && list.start !== 1 ? ` start="${list.start}"` : "";
+    out.push(`<${list.tag}${start}>${list.items.map((it) => `<li>${it.map(inline).join("<br>")}</li>`).join("")}</${list.tag}>`);
+    list = null;
+  };
+  for (const line of text.split("\n")) {
+    const bullet = /^\s*[-*+•]\s+(.*)$/.exec(line);
+    const number = /^\s*(\d+)[.)]\s+(.*)$/.exec(line);
+    const heading = /^\s*#{1,6}\s+(.*)$/.exec(line);
+    const quote = /^\s*>\s?(.*)$/.exec(line);
+    if (!line.trim()) { flushPara(); if (list) list.gap = true; continue; }
+    if (bullet || number) {
+      flushPara();
+      const tag = bullet ? "ul" : "ol";
+      if (!list || list.tag !== tag) { flushList(); list = { tag, start: number ? +number[1] : 1, items: [] }; }
+      list.items.push([bullet ? bullet[1] : number[2]]);
+      list.gap = false;
+    } else if (heading) {
+      flushPara(); flushList();
+      out.push(`<h3>${inline(heading[1].replace(/#+\s*$/, ""))}</h3>`);
+    } else if (quote) {
+      flushPara(); flushList();
+      out.push(`<blockquote>${inline(quote[1])}</blockquote>`);
+    } else if (list && !list.gap && /^\s{2,}/.test(line)) {
+      list.items[list.items.length - 1].push(line.trim());   // a list item that wraps onto the next line
+    } else {
+      flushList();
+      para.push(line.trim());
+    }
+  }
+  flushPara(); flushList();
+  return out.join("");
+}
+
 function formatAnswer(text) {
-  const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  return text.split(/```[\w-]*\n?/).map((part, i) => (i % 2 ? `<pre dir="ltr"><code>${esc(part.replace(/\n$/, ""))}</code></pre>` : esc(part))).join("");
+  // Code fences alternate text and code; an unfinished fence (still streaming) is shown as code too.
+  return text.split(/^\s*```[\w+-]*\s*$/m).map((part, i) =>
+    i % 2 ? `<pre dir="ltr"><code>${escHTML(part.replace(/^\n|\n$/g, ""))}</code></pre>` : blocks(part)).join("");
 }
 
 function renderLog() {
@@ -156,7 +212,12 @@ function renderLog() {
     return;
   }
   // No spaces around the text: messages keep their line breaks (white-space: pre-wrap).
-  log.innerHTML = history.map((m) => `<div class="msg msg-${m.role}" dir="auto"><span class="sr-only">${t(m.role === "user" ? "chat.you" : "chat.ai")}: </span>${formatAnswer(m.content) || "…"}</div>`).join("");
+  log.innerHTML = history.map((m) => m.role === "user"
+    ? `<div class="msg msg-user" dir="auto"><span class="sr-only">${t("chat.you")}: </span>${escHTML(m.content)}</div>`
+    : `<div class="msg msg-assistant${m.writing ? " writing" : ""}" dir="auto">
+        <div class="msg-who"><span aria-hidden="true">✦</span> <bdi>${escHTML(m.model || t("chat.ai"))}</bdi></div>
+        <div class="msg-body">${formatAnswer(m.content)}</div>
+      </div>`).join("");
   log.scrollTop = log.scrollHeight;
 }
 
@@ -177,7 +238,7 @@ async function ask(text) {
   busy = true;
   const model = MODELS.find((m) => m.id === loadedId);
   history.push({ role: "user", content: text });
-  const reply = { role: "assistant", content: "" };
+  const reply = { role: "assistant", content: "", model: model.name, writing: true };
   const messages = trimmed();
   history.push(reply);
   $("q").value = "";
@@ -208,6 +269,7 @@ async function ask(text) {
     reply.content ||= t("chat.error", { msg: err.message || String(err) });
     $("chatState").textContent = "";
   } finally {
+    reply.writing = false;
     busy = false;
     $("send").hidden = false;
     $("stop").hidden = true;
