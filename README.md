@@ -72,6 +72,13 @@ A static search & compare page: plain HTML, CSS and JavaScript with no build too
   with [Transformers.js](https://github.com/huggingface/transformers.js), so nothing they record or upload leaves it.
   Speech to text uses Whisper tiny (about 40 MB), translation uses OPUS-MT (about 80 MB per language pair, 10 languages
   to and from English), and background removal uses MODNet (about 6 MB). The browser keeps each model after the first download.
+- **The family tree of open AI** (`site/tree.html`, `site/tree.js`): pick a family (Llama, Qwen, Whisper, …) or type any
+  Hugging Face model to see what it was built from and what people built from it (fine-tuned versions, add-ons,
+  compressed copies and merges), plus the languages those descendants were made for. Everything is read live from the
+  Hugging Face API; click any model to make it the center.
+- **Your computer's AI menu** (`site/menu.html`, `site/menu.js`): the finder's best pick for every task on one computer,
+  with "How to use" steps and two alternatives. It guesses the computer from the browser (or uses the visitor's saved
+  settings), can be printed or saved as a PDF, and can be shared as a link (`?ram=32&vram=12&mac=0&biz=1`).
 - **Languages**: English, Español, Français, Português, العربية, اردو, हिन्दी and 中文, chosen from the header
   (it starts in the browser's language; `?lang=ur` in the link picks one). Arabic and Urdu switch the page to right-to-left.
   The interface text lives in `site/i18n.js`; project descriptions and hand-written setup steps stay in English.

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Menu · OpenSourceAi</title>
+  <meta name="description" content="The best open-source AI your computer can run for every task, with the steps to start.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap">
+  <link rel="stylesheet" href="style.css?v=585641a9cb">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <div class="top-row">
+        <h1><a class="home" href="index.html" data-page="index.html">OpenSourceAi</a></h1>
+        <label class="langpick no-print"><span class="sr-only" data-i18n="language">Language</span>
+          <select id="lang"></select>
+        </label>
+      </div>
+      <nav class="toplinks no-print">
+        <a href="index.html" data-page="index.html" data-i18n="try.back">← All projects</a>
+        <a href="try.html" data-page="try.html" data-i18n="try.link">Try AI in your browser →</a>
+        <a href="tree.html" data-page="tree.html" data-i18n="nav.tree">Family tree of open AI</a>
+      </nav>
+      <h2 class="try-title" data-i18n="menu.title">Your computer's AI menu</h2>
+      <p class="tagline" data-i18n="menu.intro"></p>
+    </div>
+  </header>
+
+  <main class="wrap menu-page">
+    <section class="finder menu-pc">
+      <p id="pcSource" class="demo-meta"></p>
+      <h2 id="pcLine"></h2>
+      <div class="specs-row no-print">
+        <label><span data-i18n="specs.ram">Memory (RAM)</span>
+          <select id="pcRam">
+            <option value="4">4 GB</option><option value="8">8 GB</option><option value="16">16 GB</option>
+            <option value="32">32 GB</option><option value="64">64 GB</option><option value="128">128 GB</option>
+          </select>
+        </label>
+        <label><span data-i18n="specs.vram">Graphics card memory</span>
+          <select id="pcVram">
+            <option value="0">No graphics card</option><option value="4">4 GB</option><option value="6">6 GB</option>
+            <option value="8">8 GB</option><option value="12">12 GB</option><option value="16">16 GB</option>
+            <option value="24">24 GB</option><option value="48">48 GB</option><option value="80">80 GB or more</option>
+          </select>
+        </label>
+        <label class="opt"><input type="checkbox" id="pcMac"> <span data-i18n="specs.mac">Mac with Apple chip (M1 or newer)</span></label>
+        <label class="opt"><input type="checkbox" id="biz"> <span data-i18n="menu.business">Only show AI I can use for business</span></label>
+      </div>
+      <p class="specs-help no-print" data-i18n="specs.help"></p>
+    </section>
+
+    <p id="menuStatus" class="demo-status" role="status"></p>
+    <ol id="menu" class="menu-list"></ol>
+
+    <div class="demo-actions no-print">
+      <button id="print" class="primary" data-i18n="menu.print">Print or save as PDF</button>
+      <button id="share" class="ghost" data-i18n="menu.share">Share my menu</button>
+      <span id="shareNote" class="demo-status" role="status"></span>
+    </div>
+    <p id="made" class="print-only demo-meta"></p>
+  </main>
+
+  <dialog id="howtoDialog" aria-labelledby="howtoTitle">
+    <div class="dialog-head">
+      <h2 id="howtoTitle"></h2>
+      <button id="howtoClose" class="ghost" data-i18n-aria="close" aria-label="Close">✕</button>
+    </div>
+    <div class="howto-body" id="howtoBody"></div>
+  </dialog>
+
+  <script src="i18n.js?v=d8b5d6873e"></script>
+  <script src="app.js?v=fa33b8cb42"></script>
+  <script src="menu.js?v=889412a958"></script>
+</body>
+</html>

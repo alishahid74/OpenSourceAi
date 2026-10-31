@@ -675,4 +675,5 @@ async function main() {
   }
 }
 
-main();
+// menu.html loads this file for its shared logic and sets up its own page.
+if ($("results")) main();
