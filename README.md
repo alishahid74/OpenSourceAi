@@ -109,14 +109,6 @@ After rebuilding the catalog, refresh the site's copy:
 python scripts/build_site.py
 ```
 
-To put it online, upload the `site/` folder to any static host, such as GitHub Pages, Netlify or Cloudflare Pages.
-
-### GitHub
-
-- `.github/workflows/pages.yml` deploys `site/` to GitHub Pages on every push to `main` that changes it.
-- `.github/workflows/refresh.yml` re-collects the catalog every Monday, commits it if anything changed, and redeploys.
-  Start it any time from the repo's **Actions** tab, under "Refresh catalog", by clicking **Run workflow**.
-
 ## License
 
 The code and the hand-picked list in this repo are under the [MIT License](LICENSE).
