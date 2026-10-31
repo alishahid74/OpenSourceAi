@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chat · OpenSourceAi</title>
+  <meta name="description" content="Chat with open-source AI for free. The model downloads once and runs inside the page on your own computer, so nothing you type leaves it.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap">
+  <link rel="stylesheet" href="style.css?v=7d885dbada">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <div class="top-row">
+        <h1><a class="home" href="index.html" data-page="index.html">OpenSourceAi</a></h1>
+        <label class="langpick"><span class="sr-only" data-i18n="language">Language</span>
+          <select id="lang"></select>
+        </label>
+      </div>
+      <nav class="toplinks">
+        <a href="index.html" data-page="index.html" data-i18n="try.back">← All projects</a>
+        <a href="try.html" data-page="try.html" data-i18n="try.link">Try AI in your browser →</a>
+        <a href="tree.html" data-page="tree.html" data-i18n="nav.tree">Family tree of open AI</a>
+        <a href="menu.html" data-page="menu.html" data-i18n="nav.menu">Your computer's AI menu</a>
+      </nav>
+      <h2 class="try-title" data-i18n="chat.title">Chat with open AI, free and private</h2>
+      <p class="tagline" data-i18n="chat.intro"></p>
+    </div>
+  </header>
+
+  <main class="wrap chat-page">
+    <p id="support" class="chat-support" role="status" data-i18n="chat.checking"></p>
+
+    <section class="demo chat-models" aria-labelledby="pickTitle">
+      <h2 id="pickTitle" data-i18n="chat.pick">Choose a model</h2>
+      <div id="models" class="model-cards"></div>
+      <div class="demo-actions">
+        <button id="start" class="primary" type="button"></button>
+      </div>
+      <progress id="loadBar" max="1" value="0" hidden></progress>
+      <p id="loadStatus" class="demo-status" role="status"></p>
+    </section>
+
+    <section class="chat-box" aria-labelledby="modelName">
+      <div class="chat-head">
+        <h2 id="modelName" dir="ltr"></h2>
+        <span id="chatState" class="demo-meta" role="status"></span>
+        <button id="newChat" class="ghost" type="button" data-i18n="chat.new">New chat</button>
+      </div>
+      <div id="log" class="chat-log"></div>
+      <form id="chatForm" class="chat-input">
+        <label for="q" class="sr-only" data-i18n="chat.placeholder">Ask anything</label>
+        <textarea id="q" rows="2" dir="auto" data-i18n-placeholder="chat.placeholder"></textarea>
+        <button id="send" class="primary" data-i18n="chat.send">Send</button>
+        <button id="stop" class="ghost" type="button" data-i18n="chat.stop" hidden>Stop</button>
+      </form>
+      <p class="demo-meta" data-i18n="chat.warn"></p>
+    </section>
+  </main>
+
+  <script src="i18n.js?v=72df87efb4"></script>
+  <script type="module" src="chat.js?v=af91210cb3"></script>
+</body>
+</html>

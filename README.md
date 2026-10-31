@@ -72,6 +72,10 @@ A static search & compare page: plain HTML, CSS and JavaScript with no build too
   with [Transformers.js](https://github.com/huggingface/transformers.js), so nothing they record or upload leaves it.
   Speech to text uses Whisper tiny (about 40 MB), translation uses OPUS-MT (about 80 MB per language pair, 10 languages
   to and from English), and background removal uses MODNet (about 6 MB). The browser keeps each model after the first download.
+- **Chat with AI, free** (`site/chat.html`, `site/chat.js`): a chat page where the model runs inside the page on the
+  visitor's own computer with [WebLLM](https://github.com/mlc-ai/web-llm) (WebGPU, so a recent Chrome or Edge).
+  Four small models to pick from (SmolLM2 360M, Qwen2.5 1.5B, Llama 3.2 3B, Qwen3 4B); each downloads once and the
+  browser keeps it. No account, no key, and nothing typed leaves the computer. `chat.html?prompt=...` fills in a question.
 - **The family tree of open AI** (`site/tree.html`, `site/tree.js`): pick a family (Llama, Qwen, Whisper, …) or type any
   Hugging Face model to see what it was built from and what people built from it (fine-tuned versions, add-ons,
   compressed copies and merges), plus the languages those descendants were made for. Everything is read live from the
