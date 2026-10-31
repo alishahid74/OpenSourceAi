@@ -296,7 +296,11 @@ function redraw() {
 LANG = detectLang();
 redraw();
 const prefill = new URLSearchParams(location.search).get("prompt");
-if (prefill) $("q").value = prefill;
+if (prefill) {
+  $("q").value = prefill;
+  // A prompt from the Learn page in another language: the smallest model only speaks English, so suggest Qwen this time.
+  if (LANG !== "en" && chosen.id.startsWith("SmolLM2") && loadedId === null) { chosen = MODELS[0]; renderModels(); }
+}
 
 $("lang").addEventListener("change", (ev) => { chooseLang(ev.target.value); redraw(); });
 $("models").addEventListener("click", (ev) => {

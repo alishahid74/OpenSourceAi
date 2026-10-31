@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Learn to prompt · OpenSourceAi</title>
+  <meta name="description" content="Five habits that make any AI give better answers, ready-made prompts you can try in a free chat, and Anthropic's open-source tools explained simply.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap">
+  <link rel="stylesheet" href="style.css?v=bbebe0ced4">
+  <!-- site-meta -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta name="theme-color" content="#1f6f5c">
+  <link rel="canonical" href="https://alishahid74.github.io/OpenSourceAi/learn.html">
+  <meta property="og:url" content="https://alishahid74.github.io/OpenSourceAi/learn.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="OpenSourceAi">
+  <meta property="og:title" content="Learn to prompt · OpenSourceAi">
+  <meta property="og:description" content="Five habits that make any AI give better answers, ready-made prompts you can try in a free chat, and Anthropic's open-source tools explained simply.">
+  <meta property="og:image" content="https://alishahid74.github.io/OpenSourceAi/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- /site-meta -->
+</head>
+<body>
+  <a class="skip" href="#main" data-i18n="skip">Skip to content</a>
+  <!-- site-header -->
+  <header class="site-header">
+    <div class="wrap site-bar">
+      <a class="brand" href="index.html" data-page="index.html"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M22.6 10.4A8.5 8.5 0 1 0 24.5 16" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="23.2" cy="8.8" r="2.3" fill="#fff"/></svg><span>OpenSourceAi</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="siteNav" data-i18n-aria="nav.toggle" aria-label="Menu">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <nav id="siteNav" class="site-nav" data-i18n-aria="nav.main" aria-label="Main menu">
+        <a href="index.html" data-page="index.html" data-i18n="nav.find">Find AI</a>
+        <a href="chat.html" data-page="chat.html" data-i18n="nav.chatShort">Chat</a>
+        <a href="learn.html" data-page="learn.html" data-i18n="nav.learn" aria-current="page">Learn</a>
+        <a href="try.html" data-page="try.html" data-i18n="nav.tryShort">Try in browser</a>
+        <a href="tree.html" data-page="tree.html" data-i18n="nav.treeShort">Family tree</a>
+        <a href="menu.html" data-page="menu.html" data-i18n="nav.menuShort">My AI menu</a>
+      </nav>
+      <label class="langpick"><span class="sr-only" data-i18n="language">Language</span>
+        <select id="lang"></select>
+      </label>
+    </div>
+  </header>
+  <!-- /site-header -->
+  <header class="top">
+    <div class="wrap">
+      <h1 class="try-title" data-i18n="learn.title">Learn to prompt</h1>
+      <p class="tagline" data-i18n="learn.intro"></p>
+    </div>
+  </header>
+
+  <main id="main" class="wrap learn-page">
+    <section aria-labelledby="lessonsTitle">
+      <h2 id="lessonsTitle" class="section-title" data-i18n="learn.lessons">Five habits for better answers</h2>
+      <div id="lessonTabs" class="chips lesson-tabs" role="group" data-i18n-aria="learn.lessons"></div>
+      <div id="lesson" class="lesson" aria-live="polite"></div>
+    </section>
+
+    <section aria-labelledby="libraryTitle">
+      <h2 id="libraryTitle" class="section-title" data-i18n="learn.library">Ready-made prompts</h2>
+      <p class="section-intro" data-i18n="learn.libraryIntro"></p>
+      <div id="prompts" class="prompt-grid"></div>
+    </section>
+
+    <section aria-labelledby="claudeTitle">
+      <h2 id="claudeTitle" class="section-title" data-i18n="learn.claude">Claude and open source</h2>
+      <p class="section-intro"><span class="tag lic-custom" data-i18n="learn.claudeTag">Claude itself isn't open source</span> <span data-i18n="learn.claudeIntro"></span></p>
+      <div id="claudeCards" class="home-cards"></div>
+      <p class="demo-meta"><a href="https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview" target="_blank" rel="noopener" data-i18n="learn.claudeDocs">Anthropic's prompting guide ↗</a></p>
+    </section>
+  </main>
+
+  <!-- site-footer -->
+  <footer class="site-footer">
+    <div class="wrap foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="index.html" data-page="index.html"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M22.6 10.4A8.5 8.5 0 1 0 24.5 16" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="23.2" cy="8.8" r="2.3" fill="#fff"/></svg><span>OpenSourceAi</span></a>
+        <p data-i18n="foot.tagline">Open-source AI, explained simply.</p>
+        <p data-i18n="foot.privacy">No accounts, no ads, no tracking.</p>
+      </div>
+      <nav class="foot-col" aria-labelledby="footExplore">
+        <h2 id="footExplore" data-i18n="foot.explore">Explore</h2>
+          <a href="index.html" data-page="index.html" data-i18n="nav.find">Find AI</a>
+          <a href="chat.html" data-page="chat.html" data-i18n="nav.chatShort">Chat</a>
+          <a href="learn.html" data-page="learn.html" data-i18n="nav.learn">Learn</a>
+          <a href="try.html" data-page="try.html" data-i18n="nav.tryShort">Try in browser</a>
+          <a href="tree.html" data-page="tree.html" data-i18n="nav.treeShort">Family tree</a>
+          <a href="menu.html" data-page="menu.html" data-i18n="nav.menuShort">My AI menu</a>
+      </nav>
+      <div class="foot-col">
+        <h2 data-i18n="foot.about">About</h2>
+        <a href="https://github.com/alishahid74/OpenSourceAi#rules-for-what-counts-as-open-source" data-i18n="foot.licenses">How we check licenses</a>
+        <a href="https://github.com/alishahid74/OpenSourceAi#whats-here" data-i18n="foot.sources">Where the data comes from</a>
+      </div>
+      <div class="foot-col">
+        <h2 data-i18n="foot.project">Project</h2>
+        <a href="https://github.com/alishahid74/OpenSourceAi" data-i18n="foot.code">Source code on GitHub</a>
+        <a href="https://github.com/alishahid74/OpenSourceAi/issues/new?title=Suggest%20a%20project" data-i18n="foot.suggest">Suggest a project</a>
+        <a href="https://github.com/alishahid74/OpenSourceAi/issues/new" data-i18n="foot.report">Report a problem</a>
+      </div>
+    </div>
+    <div class="wrap foot-bottom"><span>© 2026 OpenSourceAi</span><span data-i18n="foot.mit">Site code under the MIT License.</span></div>
+  </footer>
+  <!-- /site-footer -->
+  <script src="i18n.js?v=4f5befcc2c"></script>
+  <script src="learn.js?v=420c498b08"></script>
+</body>
+</html>

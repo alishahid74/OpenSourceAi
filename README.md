@@ -76,6 +76,9 @@ A static search & compare page: plain HTML, CSS and JavaScript with no build too
   visitor's own computer with [WebLLM](https://github.com/mlc-ai/web-llm) (WebGPU, so a recent Chrome or Edge).
   Four small models to pick from (SmolLM2 360M, Qwen2.5 1.5B, Llama 3.2 3B, Qwen3 4B); each downloads once and the
   browser keeps it. No account, no key, and nothing typed leaves the computer. `chat.html?prompt=...` fills in a question.
+- **Learn to prompt** (`site/learn.html`, `site/learn.js`): five prompting habits, each with a weak and a better prompt,
+  ten ready-made prompts, and Anthropic's open-source pieces (Agent Skills, MCP, the prompting tutorial). Every example
+  has a "Try it" button that opens the chat with the prompt typed in. The lessons and prompts are in `learn.js`, per language.
 - **The family tree of open AI** (`site/tree.html`, `site/tree.js`): pick a family (Llama, Qwen, Whisper, …) or type any
   Hugging Face model to see what it was built from and what people built from it (fine-tuned versions, add-ons,
   compressed copies and merges), plus the languages those descendants were made for. Everything is read live from the

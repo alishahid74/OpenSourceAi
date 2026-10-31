@@ -20,10 +20,10 @@ ROOT = Path(__file__).resolve().parent.parent
 SITE_URL = "https://alishahid74.github.io/OpenSourceAi/"
 GITHUB = "https://github.com/alishahid74/OpenSourceAi"
 # The menu, in order: page file and the i18n key of its short name.
-PAGES = [("index.html", "nav.find"), ("chat.html", "nav.chatShort"), ("try.html", "nav.tryShort"),
+PAGES = [("index.html", "nav.find"), ("chat.html", "nav.chatShort"), ("learn.html", "nav.learn"), ("try.html", "nav.tryShort"),
          ("tree.html", "nav.treeShort"), ("menu.html", "nav.menuShort")]
 ENGLISH = {"nav.find": "Find AI", "nav.chatShort": "Chat", "nav.tryShort": "Try in browser",
-           "nav.treeShort": "Family tree", "nav.menuShort": "My AI menu"}
+           "nav.treeShort": "Family tree", "nav.menuShort": "My AI menu", "nav.learn": "Learn"}
 MARK = ('<svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="currentColor"/>'
         '<path d="M22.6 10.4A8.5 8.5 0 1 0 24.5 16" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>'
         '<circle cx="23.2" cy="8.8" r="2.3" fill="#fff"/></svg>')
@@ -144,10 +144,10 @@ def apply_layout():
 
 def stamp_assets():
     """Point the pages at their scripts and style.css with ?v=<hash> so browsers fetch new versions after a deploy."""
-    for page in ("index.html", "try.html", "tree.html", "menu.html", "chat.html", "404.html"):
+    for page in ("index.html", "try.html", "tree.html", "menu.html", "chat.html", "learn.html", "404.html"):
         path = ROOT / "site" / page
         html = path.read_text(encoding="utf-8")
-        for name in ("i18n.js", "app.js", "try.js", "tree.js", "menu.js", "chat.js", "style.css"):
+        for name in ("i18n.js", "app.js", "try.js", "tree.js", "menu.js", "chat.js", "learn.js", "style.css"):
             digest = hashlib.sha256((ROOT / "site" / name).read_bytes()).hexdigest()[:10]
             html = re.sub(rf'"{re.escape(name)}(\?v=[0-9a-f]+)?"', f'"{name}?v={digest}"', html)
         path.write_text(html, encoding="utf-8")

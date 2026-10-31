@@ -2616,6 +2616,99 @@ const LAYOUT_STRINGS = {
 };
 for (const [code, dict] of Object.entries(LAYOUT_STRINGS)) Object.assign(STRINGS[code], dict);
 
+// Labels for learn.html. The lessons and prompts themselves are in learn.js.
+const LEARN_STRINGS = {
+  en: {
+    "nav.learn": "Learn", "learn.title": "Learn to prompt",
+    "learn.intro": "Five habits that make any AI give better answers. Every example has a \"Try it\" button that opens the free chat with the prompt already typed in.",
+    "learn.lessons": "Five habits for better answers", "learn.weak": "Weak", "learn.better": "Better",
+    "learn.try": "Try it in the chat", "learn.tryShort": "Try it", "learn.copy": "Copy", "learn.copied": "Copied", "learn.copyFailed": "Couldn't copy",
+    "learn.library": "Ready-made prompts",
+    "learn.libraryIntro": "Use them in our free chat, or copy them into Claude, ChatGPT or any other AI. Replace the parts in [brackets] with your own text.",
+    "learn.claude": "Claude and open source", "learn.claudeTag": "Claude itself isn't open source",
+    "learn.claudeIntro": "These are the parts Anthropic, the company behind Claude, has shared openly. They work with open models too.",
+    "learn.claudeDocs": "Anthropic's prompting guide ↗",
+  },
+  es: {
+    "nav.learn": "Aprender", "learn.title": "Aprende a escribir prompts",
+    "learn.intro": "Cinco hábitos que hacen que cualquier IA responda mejor. Cada ejemplo tiene un botón \"Probar\" que abre el chat gratuito con el prompt ya escrito.",
+    "learn.lessons": "Cinco hábitos para mejores respuestas", "learn.weak": "Flojo", "learn.better": "Mejor",
+    "learn.try": "Probar en el chat", "learn.tryShort": "Probar", "learn.copy": "Copiar", "learn.copied": "Copiado", "learn.copyFailed": "No se pudo copiar",
+    "learn.library": "Prompts listos para usar",
+    "learn.libraryIntro": "Úsalos en nuestro chat gratuito o cópialos en Claude, ChatGPT u otra IA. Cambia las partes entre [corchetes] por tu propio texto.",
+    "learn.claude": "Claude y el código abierto", "learn.claudeTag": "Claude en sí no es de código abierto",
+    "learn.claudeIntro": "Estas son las partes que Anthropic, la empresa detrás de Claude, ha publicado abiertamente. También funcionan con modelos abiertos.",
+    "learn.claudeDocs": "Guía de prompts de Anthropic (en inglés) ↗",
+  },
+  fr: {
+    "nav.learn": "Apprendre", "learn.title": "Apprendre à écrire des prompts",
+    "learn.intro": "Cinq habitudes pour que n'importe quelle IA réponde mieux. Chaque exemple a un bouton « Essayer » qui ouvre le chat gratuit avec le prompt déjà saisi.",
+    "learn.lessons": "Cinq habitudes pour de meilleures réponses", "learn.weak": "Faible", "learn.better": "Mieux",
+    "learn.try": "Essayer dans le chat", "learn.tryShort": "Essayer", "learn.copy": "Copier", "learn.copied": "Copié", "learn.copyFailed": "Copie impossible",
+    "learn.library": "Prompts prêts à l'emploi",
+    "learn.libraryIntro": "Utilisez-les dans notre chat gratuit ou copiez-les dans Claude, ChatGPT ou une autre IA. Remplacez les parties entre [crochets] par votre texte.",
+    "learn.claude": "Claude et l'open source", "learn.claudeTag": "Claude lui-même n'est pas open source",
+    "learn.claudeIntro": "Voici ce qu'Anthropic, l'entreprise derrière Claude, a publié ouvertement. Cela fonctionne aussi avec les modèles ouverts.",
+    "learn.claudeDocs": "Guide des prompts d'Anthropic (en anglais) ↗",
+  },
+  pt: {
+    "nav.learn": "Aprender", "learn.title": "Aprenda a escrever prompts",
+    "learn.intro": "Cinco hábitos que fazem qualquer IA responder melhor. Cada exemplo tem um botão \"Testar\" que abre o chat grátis com o prompt já digitado.",
+    "learn.lessons": "Cinco hábitos para respostas melhores", "learn.weak": "Fraco", "learn.better": "Melhor",
+    "learn.try": "Testar no chat", "learn.tryShort": "Testar", "learn.copy": "Copiar", "learn.copied": "Copiado", "learn.copyFailed": "Não foi possível copiar",
+    "learn.library": "Prompts prontos",
+    "learn.libraryIntro": "Use-os no nosso chat grátis ou copie-os para o Claude, o ChatGPT ou outra IA. Troque as partes entre [colchetes] pelo seu texto.",
+    "learn.claude": "Claude e código aberto", "learn.claudeTag": "O Claude em si não é código aberto",
+    "learn.claudeIntro": "Estas são as partes que a Anthropic, empresa por trás do Claude, publicou abertamente. Elas também funcionam com modelos abertos.",
+    "learn.claudeDocs": "Guia de prompts da Anthropic (em inglês) ↗",
+  },
+  ar: {
+    "nav.learn": "تعلّم", "learn.title": "تعلّم كتابة الأوامر",
+    "learn.intro": "خمس عادات تجعل أي ذكاء اصطناعي يجيب بشكل أفضل. لكل مثال زر \"جرّب\" يفتح المحادثة المجانية والأمر مكتوب فيها مسبقًا.",
+    "learn.lessons": "خمس عادات لإجابات أفضل", "learn.weak": "ضعيف", "learn.better": "أفضل",
+    "learn.try": "جرّبه في المحادثة", "learn.tryShort": "جرّب", "learn.copy": "نسخ", "learn.copied": "تم النسخ", "learn.copyFailed": "تعذّر النسخ",
+    "learn.library": "أوامر جاهزة",
+    "learn.libraryIntro": "استخدمها في محادثتنا المجانية أو انسخها إلى Claude أو ChatGPT أو أي ذكاء اصطناعي آخر. استبدل ما بين [القوسين] بنصك.",
+    "learn.claude": "Claude والمصادر المفتوحة", "learn.claudeTag": "Claude نفسه ليس مفتوح المصدر",
+    "learn.claudeIntro": "هذه هي الأجزاء التي نشرتها Anthropic، الشركة المطوّرة لـ Claude، بشكل مفتوح. وهي تعمل مع النماذج المفتوحة أيضًا.",
+    "learn.claudeDocs": "دليل Anthropic لكتابة الأوامر (بالإنجليزية) ↗",
+  },
+  ur: {
+    "nav.learn": "سیکھیں", "learn.title": "پرامپٹ لکھنا سیکھیں",
+    "learn.intro": "پانچ عادتیں جن سے ہر AI بہتر جواب دیتا ہے۔ ہر مثال کے ساتھ \"آزمائیں\" کا بٹن ہے جو مفت چیٹ میں پرامپٹ لکھا ہوا کھول دیتا ہے۔",
+    "learn.lessons": "بہتر جوابات کی پانچ عادتیں", "learn.weak": "کمزور", "learn.better": "بہتر",
+    "learn.try": "چیٹ میں آزمائیں", "learn.tryShort": "آزمائیں", "learn.copy": "کاپی", "learn.copied": "کاپی ہو گیا", "learn.copyFailed": "کاپی نہیں ہو سکا",
+    "learn.library": "تیار پرامپٹ",
+    "learn.libraryIntro": "انہیں ہماری مفت چیٹ میں استعمال کریں یا Claude، ChatGPT یا کسی اور AI میں کاپی کریں۔ [بریکٹ] والے حصے اپنے متن سے بدل دیں۔",
+    "learn.claude": "Claude اور اوپن سورس", "learn.claudeTag": "Claude خود اوپن سورس نہیں ہے",
+    "learn.claudeIntro": "یہ وہ حصے ہیں جو Claude بنانے والی کمپنی Anthropic نے کھلے عام شیئر کیے ہیں۔ یہ اوپن ماڈلز کے ساتھ بھی کام کرتے ہیں۔",
+    "learn.claudeDocs": "Anthropic کی پرامپٹ گائیڈ (انگریزی میں) ↗",
+  },
+  hi: {
+    "nav.learn": "सीखें", "learn.title": "प्रॉम्प्ट लिखना सीखें",
+    "learn.intro": "पाँच आदतें जिनसे कोई भी AI बेहतर जवाब देता है। हर उदाहरण के साथ \"आज़माएँ\" बटन है जो मुफ़्त चैट में प्रॉम्प्ट लिखा हुआ खोल देता है।",
+    "learn.lessons": "बेहतर जवाबों की पाँच आदतें", "learn.weak": "कमज़ोर", "learn.better": "बेहतर",
+    "learn.try": "चैट में आज़माएँ", "learn.tryShort": "आज़माएँ", "learn.copy": "कॉपी", "learn.copied": "कॉपी हो गया", "learn.copyFailed": "कॉपी नहीं हो सका",
+    "learn.library": "तैयार प्रॉम्प्ट",
+    "learn.libraryIntro": "इन्हें हमारी मुफ़्त चैट में इस्तेमाल करें या Claude, ChatGPT या किसी और AI में कॉपी करें। [ब्रैकेट] वाले हिस्से अपने टेक्स्ट से बदल दें।",
+    "learn.claude": "Claude और ओपन सोर्स", "learn.claudeTag": "Claude ख़ुद ओपन सोर्स नहीं है",
+    "learn.claudeIntro": "ये वे हिस्से हैं जो Claude बनाने वाली कंपनी Anthropic ने खुले तौर पर साझा किए हैं। ये ओपन मॉडल के साथ भी काम करते हैं।",
+    "learn.claudeDocs": "Anthropic की प्रॉम्प्ट गाइड (अंग्रेज़ी में) ↗",
+  },
+  zh: {
+    "nav.learn": "学习", "learn.title": "学写提示词",
+    "learn.intro": "五个习惯，让任何 AI 回答得更好。每个例子都有\"试一试\"按钮，会打开免费聊天并预先填好提示词。",
+    "learn.lessons": "获得更好回答的五个习惯", "learn.weak": "较弱", "learn.better": "更好",
+    "learn.try": "在聊天中试一试", "learn.tryShort": "试一试", "learn.copy": "复制", "learn.copied": "已复制", "learn.copyFailed": "无法复制",
+    "learn.library": "现成的提示词",
+    "learn.libraryIntro": "可以在我们的免费聊天里用，也可以复制到 Claude、ChatGPT 或其他 AI。把 [方括号] 里的内容换成你自己的文字。",
+    "learn.claude": "Claude 与开源", "learn.claudeTag": "Claude 本身不是开源的",
+    "learn.claudeIntro": "以下是 Claude 背后的公司 Anthropic 公开分享的部分，同样适用于开源模型。",
+    "learn.claudeDocs": "Anthropic 提示词指南（英文）↗",
+  },
+};
+for (const [code, dict] of Object.entries(LEARN_STRINGS)) Object.assign(STRINGS[code], dict);
+
 let LANG = "en";
 
 function detectLang() {
